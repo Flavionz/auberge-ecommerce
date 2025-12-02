@@ -1,0 +1,50 @@
+/* URL IMPORTS (SUCH AS FONT IMPORTS) SHOULD BE KEPT ABOVE TAILWIND IMPORTS - DO NOT DELETE THIS COMMENT */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap');
+/* PLEASE NOTE: THESE TAILWIND IMPORTS SHOULD NEVER BE DELETED - DO NOT DELETE THIS COMMENT */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+/* DO NOT DELETE THESE TAILWIND IMPORTS, OTHERWISE THE STYLING WILL NOT RENDER AT ALL - DO NOT DELETE THIS COMMENT */
+@layer base {
+  body {
+    @apply bg-[#1E1B18] text-gray-100 font-sans;
+  }
+}
+@layer components {
+  .container-custom {
+    @apply container mx-auto px-4 md:px-8;
+  }
+  .nav-link {
+    @apply text-gray-300 hover:text-gold transition-colors duration-300 text-sm tracking-wider;
+  }
+  .btn-primary {
+    @apply border border-gold text-gold hover:bg-gold hover:text-[#1E1B18] px-6 py-3 transition-colors duration-300 font-medium tracking-wider;
+  }
+  .section-title {
+    @apply font-serif text-3xl md:text-4xl font-bold text-white mb-8 relative;
+  }
+  .section-title:after {
+    content: "";
+    @apply absolute left-0 -bottom-3 w-20 h-0.5 bg-gold;
+  }
+}
+@layer utilities {
+  .font-serif {
+    font-family: 'Playfair Display', serif;
+  }
+  .font-sans {
+    font-family: 'Montserrat', sans-serif;
+  }
+  .text-gold {
+    color: #C9A66B;
+  }
+  .bg-gold {
+    background-color: #C9A66B;
+  }
+  .text-terracotta {
+    color: #A45A52;
+  }
+  .bg-terracotta {
+    background-color: #A45A52;
+  }
+}

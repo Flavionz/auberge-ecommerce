@@ -1,0 +1,36 @@
+// server/prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite" // Per iniziare usiamo SQLite (è un file locale), poi passeremo a MySQL/Postgres in produzione
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String   // Ricorda: qui salveremo la password criptata (hash), mai in chiaro!
+  role      String   @default("user") // "admin" o "user"
+  createdAt DateTime @default(now())
+}
+
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique // Es: "Charcuterie"
+  products Product[] // Relazione: una categoria ha tanti prodotti
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  price       Float
+  stock       Int      @default(0)
+  image       String?  // URL dell'immagine
+  categoryId  Int
+  category    Category @relation(fields: [categoryId], references: [id])
+  createdAt   DateTime @default(now())
+}
