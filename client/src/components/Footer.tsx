@@ -62,7 +62,7 @@ export const Footer = () => {
 
           <div className="border-t border-gray-800 mt-8 pt-8 text-center">
             <p className="text-gray-500 text-xs">
-              &copy; {new Date().getFullYear()}L'Auberge Espagnole made by Flavio Terenzi. Tous droits
+              &copy; {new Date().getFullYear()} L'Auberge Espagnole made by Flavio Terenzi. Tous droits
               réservés.
             </p>
           </div>
