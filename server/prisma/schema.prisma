@@ -12,7 +12,7 @@ datasource db {
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
-  password  String   // Ricorda: qui salveremo la password criptata (hash), mai in chiaro!
+  password  String   //qui salveremo la password criptata(hash)
   role      String   @default("user") // "admin" o "user"
   createdAt DateTime @default(now())
 }

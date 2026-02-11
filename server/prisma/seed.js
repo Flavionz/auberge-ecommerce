@@ -1,11 +1,9 @@
-// server/prisma/seed.js
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
     console.log('🌱 Inizio del seeding...');
 
-    // 1. Creiamo le Categorie (o le troviamo se esistono già)
     const catCharcuterie = await prisma.category.upsert({
         where: { name: 'Charcuterie & Fromages' },
         update: {},
@@ -26,7 +24,6 @@ async function main() {
 
     console.log('✅ Categorie create.');
 
-    // 2. Creiamo dei Prodotti di prova
     const p1 = await prisma.product.create({
         data: {
             name: 'Jambon Ibérique Pata Negra',

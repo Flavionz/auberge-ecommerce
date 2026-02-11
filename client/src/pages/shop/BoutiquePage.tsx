@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { Navbar } from '../../components/Navbar';
-import { Footer } from '../../components/Footer';
 
 
 interface Category {
@@ -198,9 +197,6 @@ export const BoutiquePage = () => {
             )}
           </div>
         </div>
-
-        {/* INSERIMENTO DEL FOOTER */}
-        <Footer />
       </div>
   )
 }
