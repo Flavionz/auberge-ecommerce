@@ -1,19 +1,19 @@
 const express = require('express');
 const cors = require('cors');
 const { PrismaClient } = require('@prisma/client');
-const multer = require('multer'); // NUOVO: per la gestione dell'upload dei file
-const path = require('path'); // Per gestire i percorsi dei file
-const fs = require('fs'); // Per cancellare i file in caso di errore
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 require('dotenv').config();
+
+const authRoutes = require('./routes/auth');
 
 const app = express();
 const prisma = new PrismaClient();
 const PORT = 3000;
 
-// --- CONFIGURAZIONE MULTER (Upload Immagini) ---
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        // Assicura che la directory 'uploads' esista prima di salvare
         const uploadDir = 'uploads/';
         if (!fs.existsSync(uploadDir)) {
             fs.mkdirSync(uploadDir);
@@ -21,29 +21,23 @@ const storage = multer.diskStorage({
         cb(null, uploadDir);
     },
     filename: (req, file, cb) => {
-        // Crea un nome file unico: timestamp-nomeoriginale.jpg
         cb(null, Date.now() + '-' + file.originalname);
     }
 });
 
 const upload = multer({ storage: storage });
 
-// --- MIDDLEWARE ---
-app.use(cors()); // Abilita le richieste cross-origin (dal frontend React)
-app.use(express.json()); // Per leggere i body JSON
-app.use(express.urlencoded({ extended: true })); // Per i dati del form
-// NEW: Espone la cartella 'uploads' al browser (es. http://localhost:3000/uploads/immagine.jpg)
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+app.use('/api/auth', authRoutes);
 
-// --- ROTTE API ---
-
-// ROTTA DI TEST
 app.get('/', (req, res) => {
     res.send('Hola! Il server Auberge Espagnol è online 🇪🇸');
 });
 
-// ROTTA 1: GET - LEGGI TUTTE LE CATEGORIE (Usato dal form AddProduct)
 app.get('/api/categories', async (req, res) => {
     try {
         const categories = await prisma.category.findMany();
@@ -54,15 +48,13 @@ app.get('/api/categories', async (req, res) => {
     }
 });
 
-// ROTTA 2: GET - LEGGI TUTTI I PRODOTTI (Usato dalla Boutique)
 app.get('/api/products', async (req, res) => {
     try {
         const products = await prisma.product.findMany({
-            include: { category: true } // Includiamo anche il nome della categoria
+            include: { category: true }
         });
         res.json(products.map(p => ({
             ...p,
-            // Aggiungiamo l'URL completo dell'immagine per il frontend
             image: p.image ? `http://localhost:${PORT}${p.image}` : null
         })));
     } catch (error) {
@@ -71,28 +63,22 @@ app.get('/api/products', async (req, res) => {
     }
 });
 
-
-// ROTTA 3: POST - CREA UN NUOVO PRODOTTO (Usato dal Backoffice)
 app.post('/api/products', upload.single('image'), async (req, res) => {
     const { name, description, price, stock, categoryId } = req.body;
 
-    // L'immagine è stata caricata da Multer, il percorso relativo è qui:
     const imageRelativePath = req.file ? `/uploads/${req.file.filename}` : null;
 
-    // Convertiamo i valori numerici e l'ID
     const parsedPrice = parseFloat(price);
     const parsedStock = parseInt(stock, 10);
     const parsedCategoryId = parseInt(categoryId, 10);
 
-    // Validazione di base
     if (!name || isNaN(parsedPrice) || isNaN(parsedCategoryId)) {
-        // Se i dati sono incompleti o errati, puliamo il file appena caricato
         if (req.file) {
             fs.unlink(req.file.path, (err) => {
                 if (err) console.error("Errore nella pulizia del file non valido:", err);
             });
         }
-        return res.status(400).json({ error: "Données manquantes: nom, prix ou catégorie sont requis." }); // Messaggio in francese
+        return res.status(400).json({ error: "Données manquantes: nom, prix ou catégorie sont requis." });
     }
 
     try {
@@ -102,12 +88,11 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
                 description: description,
                 price: parsedPrice,
                 stock: parsedStock,
-                image: imageRelativePath, // Salviamo il percorso relativo nel DB
+                image: imageRelativePath,
                 categoryId: parsedCategoryId,
             }
         });
 
-        // Rispondiamo al frontend con l'oggetto creato
         res.status(201).json({
             ...newProduct,
             image: newProduct.image ? `http://localhost:${PORT}${newProduct.image}` : null,
@@ -116,12 +101,11 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
 
     } catch (error) {
         console.error("Errore salvataggio prodotto:", error);
-        res.status(500).json({ error: 'Erreur interne du serveur lors de la publication.' }); // Messaggio in francese
+        res.status(500).json({ error: 'Erreur interne du serveur lors de la publication.' });
     }
 });
 
-
-// --- AVVIO DEL SERVER ---
 app.listen(PORT, () => {
     console.log(`Server avviato su http://localhost:${PORT}`);
+    console.log(`🔐 Auth API disponibile su http://localhost:${PORT}/api/auth`);
 });

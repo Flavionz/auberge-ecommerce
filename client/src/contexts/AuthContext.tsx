@@ -1,15 +1,115 @@
-import { createContext } from 'react';
+import React, { createContext, useState, useEffect, ReactNode } from 'react';
+import axios from 'axios';
+
+const API_URL = 'http://localhost:3000/api';
+
+interface User {
+    id: number;
+    email: string;
+    role: string;
+}
 
 interface AuthContextType {
+    user: User | null;
     isAdmin: boolean;
-    setIsAdmin: (isAdmin: boolean) => void;
+    isLoading: boolean;
+    login: (email: string, password: string) => Promise<void>;
+    register: (email: string, password: string) => Promise<void>;
     logout: () => void;
 }
 
 export const AuthContext = createContext<AuthContextType>({
+    user: null,
     isAdmin: false,
-    setIsAdmin: () => {
-        console.warn('setIsAdmin called on default context!');
-    },
+    isLoading: true,
+    login: async () => {},
+    register: async () => {},
     logout: () => {},
 });
+
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+    const [user, setUser] = useState<User | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const isAdmin = user?.role === 'admin';
+
+    useEffect(() => {
+        const verifyToken = async () => {
+            const token = localStorage.getItem('authToken');
+
+            if (!token) {
+                setIsLoading(false);
+                return;
+            }
+
+            try {
+                const response = await axios.get(`${API_URL}/auth/verify`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+
+                setUser(response.data.user);
+            } catch (error) {
+                localStorage.removeItem('authToken');
+                setUser(null);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        verifyToken();
+    }, []);
+
+    const register = async (email: string, password: string) => {
+        try {
+            const response = await axios.post(`${API_URL}/auth/register`, {
+                email,
+                password
+            });
+
+            const { user, token } = response.data;
+            localStorage.setItem('authToken', token);
+            setUser(user);
+
+        } catch (error: any) {
+            const errorMessage = error.response?.data?.error || 'Registration failed';
+            throw new Error(errorMessage);
+        }
+    };
+
+    const login = async (email: string, password: string) => {
+        try {
+            const response = await axios.post(`${API_URL}/auth/login`, {
+                email,
+                password
+            });
+
+            const { user, token } = response.data;
+            localStorage.setItem('authToken', token);
+            setUser(user);
+
+        } catch (error: any) {
+            const errorMessage = error.response?.data?.error || 'Invalid credentials';
+            throw new Error(errorMessage);
+        }
+    };
+
+    const logout = () => {
+        localStorage.removeItem('authToken');
+        setUser(null);
+    };
+
+    return (
+        <AuthContext.Provider
+            value={{
+                user,
+                isAdmin,
+                isLoading,
+                login,
+                register,
+                logout
+            }}
+        >
+            {children}
+        </AuthContext.Provider>
+    );
+};
