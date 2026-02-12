@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, PlusCircle, Package, LogOut } from 'lucide-react';
+import { LayoutDashboard, PlusCircle, Package, Users, ShoppingBag, LogOut } from 'lucide-react';
 import { AuthContext } from '../../contexts/AuthContext';
 
 export const AdminSidebar: React.FC = () => {
@@ -23,6 +23,16 @@ export const AdminSidebar: React.FC = () => {
       path: '/admin/products',
       label: 'Gérer les Produits',
       icon: Package
+    },
+    {
+      path: '/admin/orders',
+      label: 'Commandes',
+      icon: ShoppingBag
+    },
+    {
+      path: '/admin/users',
+      label: 'Utilisateurs',
+      icon: Users
     }
   ];
 

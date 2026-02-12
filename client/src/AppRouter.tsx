@@ -8,6 +8,8 @@ import { BoutiquePage } from './pages/shop/BoutiquePage';
 import { AddProductPage } from './pages/admin/AddProductPage';
 import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
 import { ManageProductsPage } from './pages/admin/ManageProductsPage';
+import { UsersPage } from './pages/admin/UsersPage';
+import { OrdersPage } from './pages/admin/OrdersPage';
 
 export const AppRouter: React.FC = () => {
     return (
@@ -47,6 +49,18 @@ export const AppRouter: React.FC = () => {
             <Route path="/admin/products/edit/:id" element={
                 <AdminRouteProtector>
                     <AddProductPage />
+                </AdminRouteProtector>
+            } />
+
+            <Route path="/admin/orders" element={
+                <AdminRouteProtector>
+                    <OrdersPage />
+                </AdminRouteProtector>
+            } />
+
+            <Route path="/admin/users" element={
+                <AdminRouteProtector>
+                    <UsersPage />
                 </AdminRouteProtector>
             } />
         </Routes>
