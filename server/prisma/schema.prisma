@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -36,6 +36,8 @@ model Order {
   postalCode      String
   phone           String   @default("")
   notes           String   @default("")
+  paymentMethod   String   @default("cash")
+  paymentStatus   String   @default("pending")
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
