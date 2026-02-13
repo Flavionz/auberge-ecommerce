@@ -8,6 +8,7 @@ require('dotenv').config();
 
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
+const orderRoutes = require('./routes/orders');
 
 const app = express();
 const prisma = new PrismaClient();
@@ -35,6 +36,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api/orders', orderRoutes);
 
 app.get('/', (req, res) => {
     res.send('Hola! Il server Auberge Espagnol è online 🇪🇸');
@@ -111,4 +113,6 @@ app.listen(PORT, () => {
     console.log(`Server avviato su http://localhost:${PORT}`);
     console.log(`🔐 Auth API disponibile su http://localhost:${PORT}/api/auth`);
     console.log(`👤 User API disponibile su http://localhost:${PORT}/api/user`);
+    console.log(`📦 Orders API disponibile su http://localhost:${PORT}/api/orders`);
+
 });

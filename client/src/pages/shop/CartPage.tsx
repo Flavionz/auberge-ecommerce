@@ -4,7 +4,7 @@ import { CartContext } from '../../contexts/CartContext';
 import { AuthContext } from '../../contexts/AuthContext';
 import { Trash2, Plus, Minus, ShoppingBag, MapPin, AlertCircle, Info } from 'lucide-react';
 
-const ELIGIBLE_POSTCODES = ['57000', '57050', '57070', '57150', '57160', '57170' , '57140'];
+const ELIGIBLE_POSTCODES = ['57000', '57050', '57070', '57140', '57150', '57160', '57170'];
 const DELIVERY_RADIUS_KM = 15;
 const METZ_CENTER = 'Metz';
 
@@ -37,7 +37,7 @@ export const CartPage = () => {
             return;
         }
 
-        console.log('Proceed to checkout');
+        navigate('/checkout');
     };
 
     if (cartItems.length === 0) {
@@ -188,21 +188,35 @@ export const CartPage = () => {
                             </div>
 
                             {!user && (
-                                <div className="mt-6 p-4 bg-gray-800/50 rounded border border-gray-600">
-                                    <p className="text-sm text-gray-300 mb-3">Pour finaliser votre commande :</p>
-                                    <Link
-                                        to="/login"
-                                        state={{ from: '/cart' }}
-                                        className="block w-full py-2 bg-gold text-dark text-center font-bold rounded hover:bg-gold/90 transition-colors mb-2"
-                                    >
-                                        Se connecter
-                                    </Link>
-                                    <p className="text-xs text-gray-400 text-center">
-                                        Nouveau client ?{' '}
-                                        <Link to="/login" className="text-gold hover:underline">
+                                <div className="mt-6 space-y-4">
+                                    <div className="p-4 bg-gray-800/50 rounded border border-gray-600">
+                                        <p className="text-sm text-gray-300 mb-3 font-semibold">
+                                            Déjà client ?
+                                        </p>
+                                        <Link
+                                            to="/login"
+                                            state={{ from: '/cart' }}
+                                            className="block w-full py-2.5 bg-gold text-dark text-center font-bold rounded hover:bg-gold/90 transition-colors"
+                                        >
+                                            Se connecter
+                                        </Link>
+                                    </div>
+
+                                    <div className="p-4 bg-blue-900/20 rounded border border-blue-500/30">
+                                        <p className="text-sm text-blue-300 mb-3 font-semibold">
+                                            Nouveau client ?
+                                        </p>
+                                        <Link
+                                            to="/login"
+                                            state={{ from: '/cart' }}
+                                            className="block w-full py-2.5 bg-transparent border-2 border-blue-400 text-blue-300 text-center font-bold rounded hover:bg-blue-900/30 transition-colors"
+                                        >
                                             Créer un compte
                                         </Link>
-                                    </p>
+                                        <p className="text-xs text-blue-400 mt-3 text-center">
+                                            Inscription gratuite et rapide
+                                        </p>
+                                    </div>
                                 </div>
                             )}
 

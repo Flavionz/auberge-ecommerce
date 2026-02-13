@@ -34,6 +34,8 @@ model Order {
   items           String
   deliveryAddress String
   postalCode      String
+  phone           String   @default("")
+  notes           String   @default("")
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
