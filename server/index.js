@@ -109,6 +109,38 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
     }
 });
 
+// DELETE product
+app.delete('/api/products/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const product = await prisma.product.findUnique({
+            where: { id: parseInt(id) }
+        });
+
+        if (!product) {
+            return res.status(404).json({ error: 'Produit non trouvé' });
+        }
+
+        // Delete image file if exists
+        if (product.image) {
+            const imagePath = path.join(__dirname, product.image);
+            if (fs.existsSync(imagePath)) {
+                fs.unlinkSync(imagePath);
+            }
+        }
+
+        await prisma.product.delete({
+            where: { id: parseInt(id) }
+        });
+
+        res.json({ message: 'Produit supprimé avec succès' });
+    } catch (error) {
+        console.error('Failed to delete product:', error);
+        res.status(500).json({ error: 'Erreur lors de la suppression du produit' });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Server avviato su http://localhost:${PORT}`);
     console.log(`🔐 Auth API disponibile su http://localhost:${PORT}/api/auth`);

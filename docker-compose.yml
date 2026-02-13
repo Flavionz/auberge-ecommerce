@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: auberge_postgres
+    environment:
+      POSTGRES_USER: auberge_user
+      POSTGRES_PASSWORD: auberge_password_2025
+      POSTGRES_DB: auberge_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - auberge_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U auberge_user -d auberge_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PgAdmin
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: auberge_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@auberge.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    networks:
+      - auberge_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  auberge_network:
+    driver: bridge

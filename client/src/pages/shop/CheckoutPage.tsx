@@ -19,6 +19,7 @@ export const CheckoutPage = () => {
         postalCode: user?.postalCode || '',
         phone: user?.phone || '',
         notes: '',
+        paymentMethod: 'cash',
     });
 
     const [isProcessing, setIsProcessing] = useState(false);
@@ -55,6 +56,12 @@ export const CheckoutPage = () => {
         setIsProcessing(true);
         setError(null);
 
+        if (deliveryData.paymentMethod === 'card') {
+            setError('Le paiement en ligne sera bientôt disponible. Veuillez choisir le paiement à la livraison.');
+            setIsProcessing(false);
+            return;
+        }
+
         try {
             const token = localStorage.getItem('authToken');
             const orderData = {
@@ -64,6 +71,7 @@ export const CheckoutPage = () => {
                 postalCode: deliveryData.postalCode,
                 phone: deliveryData.phone,
                 notes: deliveryData.notes,
+                paymentMethod: deliveryData.paymentMethod,
             };
 
             const response = await axios.post(
@@ -95,7 +103,6 @@ export const CheckoutPage = () => {
     return (
         <div className="min-h-screen bg-[#1E1B18] text-white pt-24 pb-20">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Header with Back Button */}
                 <div className="mb-8 flex items-center justify-between">
                     <div className="flex items-center space-x-4">
                         <Link
@@ -110,7 +117,6 @@ export const CheckoutPage = () => {
                     </div>
                 </div>
 
-                {/* Step Indicator */}
                 <div className="mb-12">
                     <div className="flex items-center justify-center">
                         {steps.map((step, index) => {
@@ -148,7 +154,6 @@ export const CheckoutPage = () => {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Left: Content based on step */}
                     <div className="lg:col-span-2">
                         {currentStep === 1 && (
                             <div className="space-y-6">
@@ -195,111 +200,176 @@ export const CheckoutPage = () => {
                         )}
 
                         {currentStep === 2 && (
-                            <div className="bg-[#2C2C2C] rounded-lg p-6 border border-gray-700">
-                                <div className="flex items-center space-x-3 mb-6 pb-4 border-b border-gray-700">
-                                    <MapPin size={24} className="text-gold" />
-                                    <h2 className="text-2xl font-serif text-white">Informations de Livraison</h2>
-                                </div>
-
-                                <div className="space-y-6">
-                                    <div>
-                                        <label htmlFor="address" className="block text-sm font-medium text-gray-300 mb-2">
-                                            Adresse complète *
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id="address"
-                                            name="address"
-                                            value={deliveryData.address}
-                                            onChange={handleChange}
-                                            required
-                                            className="w-full px-4 py-3 bg-[#1E1B18] border border-gray-600 rounded text-white placeholder-gray-500 focus:border-gold focus:outline-none"
-                                            placeholder="12 rue de la Gare"
-                                        />
+                            <div className="space-y-6">
+                                <div className="bg-[#2C2C2C] rounded-lg p-6 border border-gray-700">
+                                    <div className="flex items-center space-x-3 mb-6 pb-4 border-b border-gray-700">
+                                        <MapPin size={24} className="text-gold" />
+                                        <h2 className="text-2xl font-serif text-white">Informations de Livraison</h2>
                                     </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-6">
                                         <div>
-                                            <label htmlFor="city" className="block text-sm font-medium text-gray-300 mb-2">
-                                                Ville *
+                                            <label htmlFor="address" className="block text-sm font-medium text-gray-300 mb-2">
+                                                Adresse complète *
                                             </label>
                                             <input
                                                 type="text"
-                                                id="city"
-                                                name="city"
-                                                value={deliveryData.city}
+                                                id="address"
+                                                name="address"
+                                                value={deliveryData.address}
                                                 onChange={handleChange}
                                                 required
                                                 className="w-full px-4 py-3 bg-[#1E1B18] border border-gray-600 rounded text-white placeholder-gray-500 focus:border-gold focus:outline-none"
-                                                placeholder="Metz"
+                                                placeholder="12 rue de la Gare"
+                                            />
+                                        </div>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div>
+                                                <label htmlFor="city" className="block text-sm font-medium text-gray-300 mb-2">
+                                                    Ville *
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    id="city"
+                                                    name="city"
+                                                    value={deliveryData.city}
+                                                    onChange={handleChange}
+                                                    required
+                                                    className="w-full px-4 py-3 bg-[#1E1B18] border border-gray-600 rounded text-white placeholder-gray-500 focus:border-gold focus:outline-none"
+                                                    placeholder="Metz"
+                                                />
+                                            </div>
+
+                                            <div>
+                                                <label htmlFor="postalCode" className="block text-sm font-medium text-gray-300 mb-2">
+                                                    Code Postal *
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    id="postalCode"
+                                                    name="postalCode"
+                                                    value={deliveryData.postalCode}
+                                                    onChange={handleChange}
+                                                    required
+                                                    maxLength={5}
+                                                    className={`w-full px-4 py-3 bg-[#1E1B18] border rounded text-white placeholder-gray-500 focus:outline-none ${
+                                                        isEligible
+                                                            ? 'border-green-500 focus:border-green-400'
+                                                            : deliveryData.postalCode.length === 5
+                                                                ? 'border-red-500 focus:border-red-400'
+                                                                : 'border-gray-600 focus:border-gold'
+                                                    }`}
+                                                    placeholder="57000"
+                                                />
+                                                {isEligible && (
+                                                    <p className="text-xs text-green-400 mt-1 flex items-center space-x-1">
+                                                        <CheckCircle size={12} />
+                                                        <span>Zone éligible à la livraison</span>
+                                                    </p>
+                                                )}
+                                                {!isEligible && deliveryData.postalCode.length === 5 && (
+                                                    <p className="text-xs text-red-400 mt-1 flex items-center space-x-1">
+                                                        <AlertCircle size={12} />
+                                                        <span>Zone non couverte. CP éligibles: {ELIGIBLE_POSTCODES.join(', ')}</span>
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label htmlFor="phone" className="block text-sm font-medium text-gray-300 mb-2">
+                                                Téléphone *
+                                            </label>
+                                            <input
+                                                type="tel"
+                                                id="phone"
+                                                name="phone"
+                                                value={deliveryData.phone}
+                                                onChange={handleChange}
+                                                required
+                                                className="w-full px-4 py-3 bg-[#1E1B18] border border-gray-600 rounded text-white placeholder-gray-500 focus:border-gold focus:outline-none"
+                                                placeholder="06 12 34 56 78"
                                             />
                                         </div>
 
                                         <div>
-                                            <label htmlFor="postalCode" className="block text-sm font-medium text-gray-300 mb-2">
-                                                Code Postal *
+                                            <label htmlFor="notes" className="block text-sm font-medium text-gray-300 mb-2">
+                                                Instructions de livraison (optionnel)
                                             </label>
-                                            <input
-                                                type="text"
-                                                id="postalCode"
-                                                name="postalCode"
-                                                value={deliveryData.postalCode}
+                                            <textarea
+                                                id="notes"
+                                                name="notes"
+                                                value={deliveryData.notes}
                                                 onChange={handleChange}
-                                                required
-                                                maxLength={5}
-                                                className={`w-full px-4 py-3 bg-[#1E1B18] border rounded text-white placeholder-gray-500 focus:outline-none ${
-                                                    isEligible
-                                                        ? 'border-green-500 focus:border-green-400'
-                                                        : deliveryData.postalCode.length === 5
-                                                            ? 'border-red-500 focus:border-red-400'
-                                                            : 'border-gray-600 focus:border-gold'
-                                                }`}
-                                                placeholder="57000"
+                                                rows={3}
+                                                className="w-full px-4 py-3 bg-[#1E1B18] border border-gray-600 rounded text-white placeholder-gray-500 focus:border-gold focus:outline-none"
+                                                placeholder="Code d'accès, étage, etc."
                                             />
-                                            {isEligible && (
-                                                <p className="text-xs text-green-400 mt-1 flex items-center space-x-1">
-                                                    <CheckCircle size={12} />
-                                                    <span>Zone éligible à la livraison</span>
-                                                </p>
-                                            )}
-                                            {!isEligible && deliveryData.postalCode.length === 5 && (
-                                                <p className="text-xs text-red-400 mt-1 flex items-center space-x-1">
-                                                    <AlertCircle size={12} />
-                                                    <span>Zone non couverte. CP éligibles: {ELIGIBLE_POSTCODES.join(', ')}</span>
-                                                </p>
-                                            )}
                                         </div>
                                     </div>
+                                </div>
 
-                                    <div>
-                                        <label htmlFor="phone" className="block text-sm font-medium text-gray-300 mb-2">
-                                            Téléphone *
-                                        </label>
-                                        <input
-                                            type="tel"
-                                            id="phone"
-                                            name="phone"
-                                            value={deliveryData.phone}
-                                            onChange={handleChange}
-                                            required
-                                            className="w-full px-4 py-3 bg-[#1E1B18] border border-gray-600 rounded text-white placeholder-gray-500 focus:border-gold focus:outline-none"
-                                            placeholder="06 12 34 56 78"
-                                        />
+                                <div className="bg-[#2C2C2C] rounded-lg p-6 border border-gray-700">
+                                    <div className="flex items-center space-x-3 mb-6 pb-4 border-b border-gray-700">
+                                        <CreditCard size={24} className="text-gold" />
+                                        <h2 className="text-2xl font-serif text-white">Mode de Paiement</h2>
                                     </div>
 
-                                    <div>
-                                        <label htmlFor="notes" className="block text-sm font-medium text-gray-300 mb-2">
-                                            Instructions de livraison (optionnel)
+                                    <div className="space-y-3">
+                                        <label className={`flex items-start p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                                            deliveryData.paymentMethod === 'cash'
+                                                ? 'border-gold bg-gold/10'
+                                                : 'border-gray-600 hover:border-gray-500'
+                                        }`}>
+                                            <input
+                                                type="radio"
+                                                name="paymentMethod"
+                                                value="cash"
+                                                checked={deliveryData.paymentMethod === 'cash'}
+                                                onChange={handleChange}
+                                                className="mt-1 text-gold focus:ring-gold"
+                                            />
+                                            <div className="ml-3 flex-1">
+                                                <div className="flex items-center space-x-2 mb-1">
+                                                    <span className="text-2xl">💶</span>
+                                                    <span className="text-white font-semibold">Paiement à la livraison</span>
+                                                </div>
+                                                <p className="text-sm text-gray-400">
+                                                    Espèces ou carte bancaire lors de la livraison
+                                                </p>
+                                            </div>
                                         </label>
-                                        <textarea
-                                            id="notes"
-                                            name="notes"
-                                            value={deliveryData.notes}
-                                            onChange={handleChange}
-                                            rows={3}
-                                            className="w-full px-4 py-3 bg-[#1E1B18] border border-gray-600 rounded text-white placeholder-gray-500 focus:border-gold focus:outline-none"
-                                            placeholder="Code d'accès, étage, etc."
-                                        />
+
+                                        <label className={`flex items-start p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                                            deliveryData.paymentMethod === 'card'
+                                                ? 'border-gold bg-gold/10'
+                                                : 'border-gray-600 hover:border-gray-500'
+                                        }`}>
+                                            <input
+                                                type="radio"
+                                                name="paymentMethod"
+                                                value="card"
+                                                checked={deliveryData.paymentMethod === 'card'}
+                                                onChange={handleChange}
+                                                className="mt-1 text-gold focus:ring-gold"
+                                            />
+                                            <div className="ml-3 flex-1">
+                                                <div className="flex items-center space-x-2 mb-1">
+                                                    <span className="text-2xl">💳</span>
+                                                    <span className="text-white font-semibold">Paiement en ligne par carte</span>
+                                                    <span className="px-2 py-0.5 bg-blue-500/20 border border-blue-500 text-blue-300 text-xs rounded-full">
+                            Bientôt disponible
+                          </span>
+                                                </div>
+                                                <p className="text-sm text-gray-400">
+                                                    Visa, Mastercard, American Express
+                                                </p>
+                                                <p className="text-xs text-gray-500 mt-1">
+                                                    Paiement sécurisé • Confirmation immédiate
+                                                </p>
+                                            </div>
+                                        </label>
                                     </div>
                                 </div>
                             </div>
@@ -345,14 +415,35 @@ export const CheckoutPage = () => {
                                         <CreditCard size={24} className="text-gold" />
                                         <h2 className="text-2xl font-serif text-white">Mode de Paiement</h2>
                                     </div>
-                                    <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-4">
-                                        <p className="text-green-300 text-sm font-semibold mb-1">
-                                            💶 Paiement à la livraison
-                                        </p>
-                                        <p className="text-xs text-green-400">
-                                            Vous pourrez régler en espèces ou par carte bancaire lors de la livraison.
-                                        </p>
-                                    </div>
+
+                                    {deliveryData.paymentMethod === 'cash' ? (
+                                        <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-4">
+                                            <div className="flex items-center space-x-2 mb-2">
+                                                <span className="text-2xl">💶</span>
+                                                <p className="text-green-300 text-sm font-semibold">
+                                                    Paiement à la livraison
+                                                </p>
+                                            </div>
+                                            <p className="text-xs text-green-400">
+                                                Vous pourrez régler en espèces ou par carte bancaire lors de la livraison.
+                                            </p>
+                                        </div>
+                                    ) : (
+                                        <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4">
+                                            <div className="flex items-center space-x-2 mb-2">
+                                                <span className="text-2xl">💳</span>
+                                                <p className="text-blue-300 text-sm font-semibold">
+                                                    Paiement en ligne par carte
+                                                </p>
+                                                <span className="px-2 py-0.5 bg-blue-500/20 border border-blue-500 text-blue-300 text-xs rounded-full">
+                          Bientôt disponible
+                        </span>
+                                            </div>
+                                            <p className="text-xs text-blue-400">
+                                                Paiement sécurisé via Stripe • Visa, Mastercard, American Express
+                                            </p>
+                                        </div>
+                                    )}
                                 </div>
 
                                 {error && (
@@ -364,7 +455,6 @@ export const CheckoutPage = () => {
                         )}
                     </div>
 
-                    {/* Right: Order Summary (Sticky) */}
                     <div className="lg:col-span-1">
                         <div className="bg-[#2C2C2C] rounded-lg p-6 border border-gray-700 sticky top-24">
                             <h3 className="font-serif text-xl text-white mb-4 pb-4 border-b border-gray-700">

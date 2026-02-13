@@ -52,13 +52,13 @@ export const Navbar = () => {
               )}
             </Link>
             <Link
-                to={user ? "/account" : "/login"}
+                to={user ? (user.role === 'admin' ? '/admin/dashboard' : '/account') : '/login'}
                 className="flex items-center space-x-2 text-gray-300 hover:text-gold transition-colors"
             >
               <User size={20} />
               <span className="text-sm tracking-wider">
-              {user ? "Mon Compte" : "Compte"}
-            </span>
+    {user ? "Mon Compte" : "Compte"}
+  </span>
             </Link>
           </div>
 
@@ -90,14 +90,14 @@ export const Navbar = () => {
                     )}
                   </Link>
                   <Link
-                      to={user ? "/account" : "/login"}
+                      to={user ? (user.role === 'admin' ? '/admin/dashboard' : '/account') : '/login'}
                       className="flex items-center space-x-2 text-gray-300"
                       onClick={() => setMobileMenuOpen(false)}
                   >
                     <User size={20} />
                     <span className="text-sm">
-                  {user ? "Mon Compte" : "Compte"}
-                </span>
+    {user ? "Mon Compte" : "Compte"}
+  </span>
                   </Link>
                 </div>
               </div>
