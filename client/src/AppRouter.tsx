@@ -10,6 +10,8 @@ import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
 import { ManageProductsPage } from './pages/admin/ManageProductsPage';
 import { UsersPage } from './pages/admin/UsersPage';
 import { OrdersPage } from './pages/admin/OrdersPage';
+import { CartPage } from './pages/shop/CartPage';
+
 
 export const AppRouter: React.FC = () => {
     return (
@@ -25,6 +27,12 @@ export const AppRouter: React.FC = () => {
             <Route path="/boutique" element={
                 <FrontendLayout>
                     <BoutiquePage />
+                </FrontendLayout>
+            } />
+
+            <Route path="/cart" element={
+                <FrontendLayout>
+                    <CartPage />
                 </FrontendLayout>
             } />
 

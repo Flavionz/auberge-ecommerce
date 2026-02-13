@@ -4,6 +4,7 @@ import { AppRouter } from './AppRouter';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { AuthProvider } from './contexts/AuthContext';
+import { CartProvider } from './contexts/CartContext';
 
 export const FrontendLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
@@ -21,7 +22,9 @@ export function App() {
     return (
         <BrowserRouter>
             <AuthProvider>
-                <AppRouter />
+                <CartProvider>
+                    <AppRouter />
+                </CartProvider>
             </AuthProvider>
         </BrowserRouter>
     );
