@@ -7,6 +7,7 @@ const fs = require('fs');
 require('dotenv').config();
 
 const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/user');
 
 const app = express();
 const prisma = new PrismaClient();
@@ -33,6 +34,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api/auth', authRoutes);
+app.use('/api/user', userRoutes);
 
 app.get('/', (req, res) => {
     res.send('Hola! Il server Auberge Espagnol è online 🇪🇸');
@@ -43,7 +45,7 @@ app.get('/api/categories', async (req, res) => {
         const categories = await prisma.category.findMany();
         res.json(categories);
     } catch (error) {
-        console.error("Errore di recupero categorie:", error);
+        console.error("Failed to fetch categories:", error);
         res.status(500).json({ error: 'Erreur de récupération des catégories' });
     }
 });
@@ -58,7 +60,7 @@ app.get('/api/products', async (req, res) => {
             image: p.image ? `http://localhost:${PORT}${p.image}` : null
         })));
     } catch (error) {
-        console.error("Errore nel recupero prodotti:", error);
+        console.error("Failed to fetch products:", error);
         res.status(500).json({ error: 'Erreur dans la récupération des produits' });
     }
 });
@@ -75,7 +77,7 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
     if (!name || isNaN(parsedPrice) || isNaN(parsedCategoryId)) {
         if (req.file) {
             fs.unlink(req.file.path, (err) => {
-                if (err) console.error("Errore nella pulizia del file non valido:", err);
+                if (err) console.error("Failed to clean up invalid file:", err);
             });
         }
         return res.status(400).json({ error: "Données manquantes: nom, prix ou catégorie sont requis." });
@@ -100,7 +102,7 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Errore salvataggio prodotto:", error);
+        console.error("Failed to save product:", error);
         res.status(500).json({ error: 'Erreur interne du serveur lors de la publication.' });
     }
 });
@@ -108,4 +110,5 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server avviato su http://localhost:${PORT}`);
     console.log(`🔐 Auth API disponibile su http://localhost:${PORT}/api/auth`);
+    console.log(`👤 User API disponibile su http://localhost:${PORT}/api/user`);
 });

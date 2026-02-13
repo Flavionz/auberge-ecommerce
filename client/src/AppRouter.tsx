@@ -5,13 +5,16 @@ import { AdminRouteProtector } from './pages/auth/AdminRouteProtector';
 import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/auth/LoginPage';
 import { BoutiquePage } from './pages/shop/BoutiquePage';
+import { CartPage } from './pages/shop/CartPage';
 import { AddProductPage } from './pages/admin/AddProductPage';
 import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
 import { ManageProductsPage } from './pages/admin/ManageProductsPage';
 import { UsersPage } from './pages/admin/UsersPage';
 import { OrdersPage } from './pages/admin/OrdersPage';
-import { CartPage } from './pages/shop/CartPage';
-
+import { UserDashboard } from './pages/user/UserDashboard';
+import { UserProfile } from './pages/user/UserProfile';
+import { UserOrders } from './pages/user/UserOrders';
+import { UserSettings } from './pages/user/UserSettings';
 
 export const AppRouter: React.FC = () => {
     return (
@@ -35,6 +38,11 @@ export const AppRouter: React.FC = () => {
                     <CartPage />
                 </FrontendLayout>
             } />
+
+            <Route path="/account" element={<UserDashboard />} />
+            <Route path="/account/profile" element={<UserProfile />} />
+            <Route path="/account/orders" element={<UserOrders />} />
+            <Route path="/account/settings" element={<UserSettings />} />
 
             <Route path="/admin/dashboard" element={
                 <AdminRouteProtector>

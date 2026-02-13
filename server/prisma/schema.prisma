@@ -11,11 +11,31 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String
-  role      String   @default("user")
-  createdAt DateTime @default(now())
+  id         Int      @id @default(autoincrement())
+  email      String   @unique
+  password   String
+  role       String   @default("user")
+  firstName  String?
+  lastName   String?
+  phone      String?
+  address    String?
+  city       String?
+  postalCode String?
+  createdAt  DateTime @default(now())
+  orders     Order[]
+}
+
+model Order {
+  id              Int      @id @default(autoincrement())
+  userId          Int
+  user            User     @relation(fields: [userId], references: [id])
+  status          String   @default("pending")
+  total           Float
+  items           String
+  deliveryAddress String
+  postalCode      String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model Category {
