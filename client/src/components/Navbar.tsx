@@ -2,12 +2,14 @@ import { useContext, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ShoppingCart, User, Menu, X } from 'lucide-react';
 import { CartContext } from '../contexts/CartContext';
+import { AuthContext } from '../contexts/AuthContext';
 
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const { cartCount } = useContext(CartContext);
+  const { user } = useContext(AuthContext);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -49,9 +51,14 @@ export const Navbar = () => {
               </span>
               )}
             </Link>
-            <Link to="/login" className="flex items-center space-x-2 text-gray-300 hover:text-gold transition-colors">
+            <Link
+                to={user ? "/account" : "/login"}
+                className="flex items-center space-x-2 text-gray-300 hover:text-gold transition-colors"
+            >
               <User size={20} />
-              <span className="text-sm tracking-wider">Compte</span>
+              <span className="text-sm tracking-wider">
+              {user ? "Mon Compte" : "Compte"}
+            </span>
             </Link>
           </div>
 
@@ -82,9 +89,15 @@ export const Navbar = () => {
                   </span>
                     )}
                   </Link>
-                  <Link to="/login" className="flex items-center space-x-2 text-gray-300" onClick={() => setMobileMenuOpen(false)}>
+                  <Link
+                      to={user ? "/account" : "/login"}
+                      className="flex items-center space-x-2 text-gray-300"
+                      onClick={() => setMobileMenuOpen(false)}
+                  >
                     <User size={20} />
-                    <span className="text-sm">Compte</span>
+                    <span className="text-sm">
+                  {user ? "Mon Compte" : "Compte"}
+                </span>
                   </Link>
                 </div>
               </div>

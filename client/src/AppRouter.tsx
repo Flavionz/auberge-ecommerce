@@ -15,6 +15,7 @@ import { UserDashboard } from './pages/user/UserDashboard';
 import { UserProfile } from './pages/user/UserProfile';
 import { UserOrders } from './pages/user/UserOrders';
 import { UserSettings } from './pages/user/UserSettings';
+import { UserAddress } from './pages/user/UserAddress';
 
 export const AppRouter: React.FC = () => {
     return (
@@ -43,6 +44,7 @@ export const AppRouter: React.FC = () => {
             <Route path="/account/profile" element={<UserProfile />} />
             <Route path="/account/orders" element={<UserOrders />} />
             <Route path="/account/settings" element={<UserSettings />} />
+            <Route path="/account/address" element={<UserAddress />} />
 
             <Route path="/admin/dashboard" element={
                 <AdminRouteProtector>
