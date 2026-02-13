@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { Navbar } from '../../components/Navbar';
 import { CartContext } from '../../contexts/CartContext';
+import { CartConfirmationModal } from '../../components/CartConfirmationModal';
 
 interface Category {
   id: number;
@@ -24,6 +25,8 @@ export const BoutiquePage = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string | number>('all');
+  const [showCartModal, setShowCartModal] = useState(false);
+  const [addedProduct, setAddedProduct] = useState<Product | null>(null);
 
   const { addToCart } = useContext(CartContext);
 
@@ -64,6 +67,12 @@ export const BoutiquePage = () => {
 
   const handleCategorySelect = (categoryId: string | number) => {
     setSelectedCategory(categoryId);
+  };
+
+  const handleAddToCart = (product: Product) => {
+    addToCart(product);
+    setAddedProduct(product);
+    setShowCartModal(true);
   };
 
   const getCategoryClass = (categoryId: string | number) => {
@@ -173,7 +182,7 @@ export const BoutiquePage = () => {
                                   </div>
 
                                   <button
-                                      onClick={() => addToCart(product)}
+                                      onClick={() => handleAddToCart(product)}
                                       className="w-full py-2 border border-[#Cca43b] text-[#Cca43b] hover:bg-[#Cca43b] hover:text-black transition-colors rounded uppercase text-xs tracking-wider font-bold"
                                   >
                                     Ajouter au Panier
@@ -188,6 +197,12 @@ export const BoutiquePage = () => {
             )}
           </div>
         </div>
+
+        <CartConfirmationModal
+            isOpen={showCartModal}
+            onClose={() => setShowCartModal(false)}
+            product={addedProduct}
+        />
       </div>
   );
 };
