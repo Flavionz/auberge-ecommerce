@@ -1,129 +1,165 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useDropzone } from 'react-dropzone';
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { AdminLayout } from '../../components/admin/AdminLayout';
+import { useDropzone } from 'react-dropzone';
+import axios from 'axios';
 
-interface ProductFormData {
-  name: string;
-  description: string;
-  price: string;
-  stock: string;
-  categoryId: string;
-}
+export const AddProductPage = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const isEditMode = Boolean(id);
 
-interface Category {
-  id: number;
-  name: string;
-}
-
-const API_URL = 'http://localhost:3000/api';
-
-export const AddProductPage: React.FC = () => {
-  const [formData, setFormData] = useState<ProductFormData>({
+  const [formData, setFormData] = useState({
     name: '',
     description: '',
     price: '',
     stock: '',
     categoryId: '',
   });
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [statusMessage, setStatusMessage] = useState<string | null>(null);
-  const [isError, setIsError] = useState(false);
+
+  const [categories, setCategories] = useState([]);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const API_URL = 'http://localhost:3000/api';
 
   useEffect(() => {
-    setStatusMessage(null);
-    setIsError(false);
-
-    axios.get(`${API_URL}/categories`)
-        .then(response => {
-          setCategories(response.data);
-          if (response.data.length > 0) {
-            setFormData(prev => ({ ...prev, categoryId: String(response.data[0].id) }));
-          }
-        })
-        .catch(error => {
-          console.error("Failed to load categories:", error);
-          setStatusMessage("Erreur de connexion au serveur pour les catégories.");
-          setIsError(true);
-        });
+    fetchCategories();
   }, []);
 
-  const onDrop = (acceptedFiles: File[]) => {
-    if (acceptedFiles.length > 0) {
-      setImageFile(acceptedFiles[0]);
+  useEffect(() => {
+    if (isEditMode && id) {
+      fetchProduct();
+    }
+  }, [id, isEditMode]);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/categories`);
+      setCategories(response.data);
+    } catch (error) {
+      console.error('Failed to fetch categories:', error);
     }
   };
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
-    accept: { 'image/*': ['.jpeg', '.png', '.jpg'] },
-    maxFiles: 1
-  });
+  const fetchProduct = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.get(`${API_URL}/products`);
+      const product = response.data.find((p: any) => p.id === parseInt(id!));
+
+      if (product) {
+        setFormData({
+          name: product.name,
+          description: product.description || '',
+          price: product.price.toString(),
+          stock: product.stock.toString(),
+          categoryId: product.categoryId.toString(),
+        });
+
+        if (product.image) {
+          setPreviewUrl(product.image);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch product:', error);
+      alert('Erreur lors du chargement du produit');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setStatusMessage("Chargement en cours...");
-    setIsError(false);
-
-    if (!formData.name || !formData.price || !formData.categoryId) {
-      setStatusMessage("Veuillez remplir tous les champs obligatoires.");
-      setIsError(true);
-      return;
-    }
-
-    const formPayload = new FormData();
-    formPayload.append('name', formData.name);
-    formPayload.append('description', formData.description);
-    formPayload.append('price', formData.price);
-    formPayload.append('stock', formData.stock);
-    formPayload.append('categoryId', formData.categoryId);
-
-    if (imageFile) {
-      formPayload.append('image', imageFile);
-    }
-
-    try {
-      const response = await axios.post(`${API_URL}/products`, formPayload, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        }
-      });
-
-      setStatusMessage(`Produit "${response.data.name}" publié avec succès!`);
-      setIsError(false);
-
-      setFormData({
-        name: '',
-        description: '',
-        price: '',
-        stock: '',
-        categoryId: String(categories[0]?.id || '')
-      });
-      setImageFile(null);
-
-    } catch (error) {
-      console.error("Product upload failed:", error);
-      setIsError(true);
-      setStatusMessage("Erreur lors de la publication. Le serveur a retourné une erreur.");
+  const onDrop = (acceptedFiles: File[]) => {
+    if (acceptedFiles && acceptedFiles[0]) {
+      const file = acceptedFiles[0];
+      setSelectedImage(file);
+      setPreviewUrl(URL.createObjectURL(file));
     }
   };
 
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      'image/jpeg': ['.jpg', '.jpeg'],
+      'image/png': ['.png'],
+    },
+    maxFiles: 1,
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const formDataToSend = new FormData();
+      formDataToSend.append('name', formData.name);
+      formDataToSend.append('description', formData.description);
+      formDataToSend.append('price', formData.price);
+      formDataToSend.append('stock', formData.stock);
+      formDataToSend.append('categoryId', formData.categoryId);
+
+      if (selectedImage) {
+        formDataToSend.append('image', selectedImage);
+      }
+
+      const token = localStorage.getItem('authToken');
+
+      if (isEditMode) {
+        await axios.put(`${API_URL}/products/${id}`, formDataToSend, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        alert('Produit modifié avec succès !');
+      } else {
+        await axios.post(`${API_URL}/products`, formDataToSend, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        alert('Produit ajouté avec succès !');
+      }
+
+      navigate('/admin/products');
+    } catch (error) {
+      console.error('Failed to save product:', error);
+      alert('Erreur lors de la sauvegarde du produit');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isLoading && isEditMode) {
+    return (
+        <AdminLayout>
+          <div className="text-center py-12">
+            <div className="animate-spin h-12 w-12 border-4 border-gold border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p className="text-gray-600">Chargement du produit...</p>
+          </div>
+        </AdminLayout>
+    );
+  }
+
   return (
       <AdminLayout>
-        <div className="max-w-4xl mx-auto p-8 rounded-lg bg-white shadow-xl border border-gray-200">
-          <h2 className="text-3xl font-serif text-gray-800 mb-6 border-b border-gray-300 pb-2">
-            Ajouter un Produit
-          </h2>
+        <div className="space-y-6">
+          <div className="flex justify-between items-center mb-6 border-b border-gray-200 pb-3">
+            <h2 className="text-3xl font-serif text-gray-800">
+              {isEditMode ? 'Modifier le Produit' : 'Ajouter un Produit'}
+            </h2>
+          </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <form onSubmit={handleSubmit} className="admin-form bg-white p-8 rounded-lg shadow-xl border border-gray-100">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
                   Nom du produit *
                 </label>
                 <input
@@ -132,14 +168,14 @@ export const AddProductPage: React.FC = () => {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    placeholder="Ex: Jambon Ibérique"
                     required
-                    className="w-full p-3 bg-gray-50 border border-gray-300 rounded text-gray-900 placeholder-gray-500 focus:border-gold focus:ring-gold"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gold focus:border-gold"
+                    placeholder="Ex: Jambon Ibérique"
                 />
               </div>
 
               <div>
-                <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-2">
                   Prix (€) *
                 </label>
                 <input
@@ -148,17 +184,18 @@ export const AddProductPage: React.FC = () => {
                     name="price"
                     value={formData.price}
                     onChange={handleChange}
-                    placeholder="Ex: 89.90"
-                    step="0.01"
                     required
-                    className="w-full p-3 bg-gray-50 border border-gray-300 rounded text-gray-900 placeholder-gray-500 focus:border-gold focus:ring-gold"
+                    step="0.01"
+                    min="0"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gold focus:border-gold"
+                    placeholder="Ex: 89.90"
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
-                <label htmlFor="categoryId" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="categoryId" className="block text-sm font-medium text-gray-700 mb-2">
                   Catégorie *
                 </label>
                 <select
@@ -167,23 +204,19 @@ export const AddProductPage: React.FC = () => {
                     value={formData.categoryId}
                     onChange={handleChange}
                     required
-                    className="w-full p-3 bg-gray-50 border border-gray-300 rounded text-gray-900 focus:border-gold focus:ring-gold cursor-pointer"
-                    disabled={categories.length === 0}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gold focus:border-gold"
                 >
-                  {categories.length === 0 ? (
-                      <option value="">Chargement des catégories...</option>
-                  ) : (
-                      categories.map(cat => (
-                          <option key={cat.id} value={cat.id}>
-                            {cat.name}
-                          </option>
-                      ))
-                  )}
+                  <option value="">Sélectionnez une catégorie</option>
+                  {categories.map((category: any) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                  ))}
                 </select>
               </div>
 
               <div>
-                <label htmlFor="stock" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="stock" className="block text-sm font-medium text-gray-700 mb-2">
                   Stock/Quantité
                 </label>
                 <input
@@ -192,14 +225,15 @@ export const AddProductPage: React.FC = () => {
                     name="stock"
                     value={formData.stock}
                     onChange={handleChange}
+                    min="0"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gold focus:border-gold"
                     placeholder="Ex: 10"
-                    className="w-full p-3 bg-gray-50 border border-gray-300 rounded text-gray-900 placeholder-gray-500 focus:border-gold focus:ring-gold"
                 />
               </div>
             </div>
 
-            <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+            <div className="mb-6">
+              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
                 Description
               </label>
               <textarea
@@ -208,55 +242,53 @@ export const AddProductPage: React.FC = () => {
                   value={formData.description}
                   onChange={handleChange}
                   rows={4}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gold focus:border-gold"
                   placeholder="Description détaillée du produit..."
-                  className="w-full p-3 bg-gray-50 border border-gray-300 rounded text-gray-900 placeholder-gray-500 focus:border-gold focus:ring-gold"
               />
             </div>
 
-            <div className="pt-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Image du produit (JPG, PNG)
               </label>
               <div
                   {...getRootProps()}
-                  className={`p-10 border-2 border-dashed rounded-lg transition-colors cursor-pointer text-center ${
-                      isDragActive ? 'border-gold bg-yellow-50' : 'border-gray-400 hover:border-gold'
+                  className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
+                      isDragActive
+                          ? 'border-gold bg-yellow-50'
+                          : 'border-gray-300 hover:border-gold hover:bg-gray-50'
                   }`}
               >
                 <input {...getInputProps()} />
-                {imageFile ? (
-                    <div className="flex flex-col items-center">
-                      <p className="text-gold font-bold">Image sélectionnée:</p>
-                      <p className="text-sm italic text-gray-600">{imageFile.name}</p>
+                {previewUrl ? (
+                    <div className="space-y-4">
                       <img
-                          src={URL.createObjectURL(imageFile)}
+                          src={previewUrl}
                           alt="Preview"
-                          className="mt-4 max-h-24 object-contain rounded shadow-md"
+                          className="mx-auto max-h-48 rounded-md"
                       />
+                      <p className="text-sm text-gray-600">
+                        Cliquez ou glissez une nouvelle image pour remplacer
+                      </p>
                     </div>
-                ) : isDragActive ? (
-                    <p className="text-lg text-gray-800">Déposez l'image ici...</p>
                 ) : (
-                    <p className="text-lg text-gray-500">
+                    <p className="text-gray-500">
                       Glissez-déposez l'image ou cliquez pour sélectionner
                     </p>
                 )}
               </div>
             </div>
 
-            {statusMessage && (
-                <div className={`p-3 rounded text-center font-semibold ${
-                    isError ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
-                }`}>
-                  {statusMessage}
-                </div>
-            )}
-
             <button
                 type="submit"
-                className="w-full py-3 bg-gold text-black font-bold uppercase rounded shadow-lg hover:bg-yellow-600 transition-colors"
+                disabled={isLoading}
+                className="w-full py-3 bg-gold text-black font-bold uppercase tracking-wider rounded-md hover:bg-yellow-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Publier le produit
+              {isLoading
+                  ? 'Publication en cours...'
+                  : isEditMode
+                      ? 'Modifier le Produit'
+                      : 'Publier le Produit'}
             </button>
           </form>
         </div>

@@ -109,7 +109,58 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
     }
 });
 
-// DELETE product
+app.put('/api/products/:id', upload.single('image'), async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, description, price, stock, categoryId } = req.body;
+
+        const parsedPrice = parseFloat(price);
+        const parsedStock = parseInt(stock, 10);
+        const parsedCategoryId = parseInt(categoryId, 10);
+
+        if (!name || isNaN(parsedPrice) || isNaN(parsedCategoryId)) {
+            return res.status(400).json({ error: "Données manquantes" });
+        }
+
+        const updateData = {
+            name,
+            description,
+            price: parsedPrice,
+            stock: parsedStock,
+            categoryId: parsedCategoryId,
+        };
+
+        if (req.file) {
+            const oldProduct = await prisma.product.findUnique({
+                where: { id: parseInt(id) }
+            });
+
+            if (oldProduct && oldProduct.image) {
+                const oldImagePath = path.join(__dirname, oldProduct.image);
+                if (fs.existsSync(oldImagePath)) {
+                    fs.unlinkSync(oldImagePath);
+                }
+            }
+
+            updateData.image = `/uploads/${req.file.filename}`;
+        }
+
+        const updatedProduct = await prisma.product.update({
+            where: { id: parseInt(id) },
+            data: updateData,
+        });
+
+        res.json({
+            ...updatedProduct,
+            image: updatedProduct.image ? `http://localhost:${PORT}${updatedProduct.image}` : null,
+            message: 'Produit modifié avec succès'
+        });
+    } catch (error) {
+        console.error('Failed to update product:', error);
+        res.status(500).json({ error: 'Erreur lors de la modification' });
+    }
+});
+
 app.delete('/api/products/:id', async (req, res) => {
     try {
         const { id } = req.params;
@@ -122,7 +173,6 @@ app.delete('/api/products/:id', async (req, res) => {
             return res.status(404).json({ error: 'Produit non trouvé' });
         }
 
-        // Delete image file if exists
         if (product.image) {
             const imagePath = path.join(__dirname, product.image);
             if (fs.existsSync(imagePath)) {
@@ -146,5 +196,4 @@ app.listen(PORT, () => {
     console.log(`🔐 Auth API disponibile su http://localhost:${PORT}/api/auth`);
     console.log(`👤 User API disponibile su http://localhost:${PORT}/api/user`);
     console.log(`📦 Orders API disponibile su http://localhost:${PORT}/api/orders`);
-
 });

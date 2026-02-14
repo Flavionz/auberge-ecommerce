@@ -17,6 +17,8 @@ import { UserOrders } from './pages/user/UserOrders';
 import { UserSettings } from './pages/user/UserSettings';
 import { UserAddress } from './pages/user/UserAddress';
 import { CheckoutPage } from './pages/shop/CheckoutPage';
+import { AboutPage } from './pages/AboutPage';
+
 
 export const AppRouter: React.FC = () => {
     return (
@@ -38,6 +40,12 @@ export const AppRouter: React.FC = () => {
             <Route path="/cart" element={
                 <FrontendLayout>
                     <CartPage />
+                </FrontendLayout>
+            } />
+
+            <Route path="/about" element={
+                <FrontendLayout>
+                    <AboutPage />
                 </FrontendLayout>
             } />
 

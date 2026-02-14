@@ -37,9 +37,9 @@ export const Navbar = () => {
             <Link to="/boutique" className={`nav-link ${isActive('/boutique') ? 'border-b border-gold pb-1' : ''}`}>
               Boutique
             </Link>
-            <a href="#about" className="nav-link">
+            <Link to="/about" className={`nav-link ${isActive('/about') ? 'border-b border-gold pb-1' : ''}`}>
               Notre Histoire
-            </a>
+            </Link>
           </div>
 
           <div className="hidden md:flex items-center space-x-6">
@@ -57,8 +57,8 @@ export const Navbar = () => {
             >
               <User size={20} />
               <span className="text-sm tracking-wider">
-    {user ? "Mon Compte" : "Compte"}
-  </span>
+              {user ? "Mon Compte" : "Compte"}
+            </span>
             </Link>
           </div>
 
@@ -76,9 +76,9 @@ export const Navbar = () => {
                 <Link to="/boutique" className="nav-link py-2 border-b border-gray-700" onClick={() => setMobileMenuOpen(false)}>
                   Boutique
                 </Link>
-                <a href="#about" className="nav-link py-2 border-b border-gray-700" onClick={() => setMobileMenuOpen(false)}>
+                <Link to="/about" className="nav-link py-2 border-b border-gray-700" onClick={() => setMobileMenuOpen(false)}>
                   Notre Histoire
-                </a>
+                </Link>
                 <div className="flex items-center justify-between pt-2">
                   <Link to="/cart" className="flex items-center space-x-2 text-gray-300 relative" onClick={() => setMobileMenuOpen(false)}>
                     <ShoppingCart size={20} />
@@ -96,8 +96,8 @@ export const Navbar = () => {
                   >
                     <User size={20} />
                     <span className="text-sm">
-    {user ? "Mon Compte" : "Compte"}
-  </span>
+                  {user ? "Mon Compte" : "Compte"}
+                </span>
                   </Link>
                 </div>
               </div>
