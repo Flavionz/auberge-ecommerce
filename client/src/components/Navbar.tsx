@@ -35,7 +35,7 @@ export const Navbar = () => {
             <img
                 src="/logo.png"
                 alt="Casa Steph Iberico Logo"
-                className="h-10 w-auto"
+                className={`w-auto transition-all duration-300 ${isScrolled ? 'h-10' : 'h-14'}`}
             />
             <span className="font-serif text-xl md:text-2xl text-white">
             Casa Steph Iberico

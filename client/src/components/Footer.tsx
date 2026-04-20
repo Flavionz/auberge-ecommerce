@@ -15,7 +15,7 @@ export const Footer = () => {
                 <img
                     src="/logo.png"
                     alt="Casa Steph Iberico Logo"
-                    className="h-12 w-auto"
+                    className="h-16 w-auto"
                 />
                 <h3 className="font-serif text-xl text-gold">
                   Casa Steph Iberico
