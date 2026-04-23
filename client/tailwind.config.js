@@ -19,6 +19,8 @@ export default {
       animation: {
         fadeIn: 'fadeIn 0.2s ease-in-out',
         slideUp: 'slideUp 0.3s ease-out',
+        logoReveal: 'logoReveal 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards',
+        float: 'float 4s ease-in-out infinite',
       },
       keyframes: {
         fadeIn: {
@@ -34,6 +36,26 @@ export default {
             opacity: '1',
             transform: 'translateY(0) scale(1)'
           },
+        },
+        logoReveal: {
+          '0%': {
+            opacity: '0',
+            transform: 'scale(0.82) translateY(-16px)',
+            filter: 'blur(6px)',
+          },
+          '60%': {
+            opacity: '1',
+            filter: 'blur(0px)',
+          },
+          '100%': {
+            opacity: '1',
+            transform: 'scale(1) translateY(0)',
+            filter: 'blur(0px)',
+          },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-10px)' },
         },
       },
     },

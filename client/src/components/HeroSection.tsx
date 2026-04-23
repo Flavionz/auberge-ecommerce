@@ -16,11 +16,16 @@ export const HeroSection = () => {
 
             {/* Content */}
             <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center">
-                <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl text-white font-bold leading-tight mb-6">
-                    L'Excellence des{' '}
-                    <span className="text-gold italic">saveurs espagnoles</span>
-                </h1>
-                <p className="text-gray-300 text-lg md:text-xl max-w-2xl mb-10 font-light">
+                {/* Hero Logo */}
+                <div className="mb-8 animate-logoReveal" style={{ animationDelay: '0.2s', opacity: 0 }}>
+                    <img
+                        src="/hero-logo.png"
+                        alt="Casa Steph Iberico"
+                        className="w-56 h-56 md:w-72 md:h-72 lg:w-80 lg:h-80 object-contain drop-shadow-[0_4px_32px_rgba(201,166,107,0.35)]"
+                    />
+                </div>
+
+                <p className="text-gray-200 text-lg md:text-xl max-w-2xl mb-10 font-light tracking-wide">
                     Une sélection authentique de produits ibériques directement chez vous.
                 </p>
 
