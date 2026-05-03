@@ -71,10 +71,10 @@ export const Footer = () => {
                 Suivez-nous
               </h4>
               <div className="flex space-x-4 mb-6">
-                <a href="https://www.facebook.com/Epicerielaubergeespagnole" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="text-gray-400 hover:text-gold transition-colors" title="Facebook — lien à mettre à jour">
+                <a href="https://www.facebook.com/profile.php?id=61569084093394" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="text-gray-400 hover:text-gold transition-colors">
                   <Facebook size={20} />
                 </a>
-                <a href="https://instagram.com/placeholder" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-gray-400 hover:text-gold transition-colors">
+                <a href="https://www.instagram.com/casa_steph_iberico" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-gray-400 hover:text-gold transition-colors">
                   <Instagram size={20} />
                 </a>
               </div>
