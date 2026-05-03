@@ -15,6 +15,7 @@ const { sendOrderReadyEmail, sendOrderDeliveredEmail, sendPaymentLinkEmail } = r
 const { authenticate, isAdmin } = require('./middleware/authMiddleware');
 
 const app = express();
+app.set('trust proxy', 1);
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 3000;
 
