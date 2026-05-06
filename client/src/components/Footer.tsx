@@ -25,7 +25,7 @@ export const Footer = () => {
                 Charcuterie & fromages ibériques premium, livrés chez vous.
               </p>
               <p className="text-gray-400 text-sm mt-2">
-                casastephiberico@gmail.com
+                casastephmetz@gmail.com
               </p>
             </div>
 
