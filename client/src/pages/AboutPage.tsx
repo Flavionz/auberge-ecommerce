@@ -77,8 +77,8 @@ export const AboutPage = () => {
                         <p className="text-lg text-gray-300 leading-relaxed">
                             En reprenant cette activité, je me suis engagé à préserver ces techniques ancestrales
                             tout en les adaptant aux exigences modernes de qualité et de traçabilité. Chaque produit
-                            que vous trouvez dans ma boutique provient de producteurs espagnols que j'ai
-                            personnellement rencontrés et avec qui j'ai établi une relation de confiance.
+                            que vous trouvez dans ma boutique provient de producteurs espagnols
+                            avec qui j'ai établi une relation de confiance.
                         </p>
                         <p className="text-lg text-gray-300 leading-relaxed">
                             Mon atelier de découpe artisanale me permet de vous proposer des portions parfaites,

@@ -17,7 +17,7 @@ const sendOrderReadyEmail = async (order, user) => {
     ).join('\n');
 
     const mailOptions = {
-        from: process.env.SMTP_FROM || '"Casa Steph Iberico" <casastephiberico@gmail.com>',
+        from: process.env.SMTP_FROM || '"Casa Steph Iberico" <casastephmetz@gmail.com>',
         to: user.email,
         subject: `Votre commande #${order.id} est prête! 🎉`,
         html: `
@@ -66,7 +66,7 @@ ${itemsList}
 
 const sendOrderDeliveredEmail = async (order, user) => {
     const mailOptions = {
-        from: process.env.SMTP_FROM || '"Casa Steph Iberico" <casastephiberico@gmail.com>',
+        from: process.env.SMTP_FROM || '"Casa Steph Iberico" <casastephmetz@gmail.com>',
         to: user.email,
         subject: `Commande #${order.id} livrée - Merci! 🎉`,
         html: `
@@ -102,7 +102,7 @@ const sendOrderDeliveredEmail = async (order, user) => {
 
 const sendPasswordResetEmail = async (user, resetLink) => {
     const mailOptions = {
-        from: process.env.SMTP_FROM || '"Casa Steph Iberico" <casastephiberico@gmail.com>',
+        from: process.env.SMTP_FROM || '"Casa Steph Iberico" <casastephmetz@gmail.com>',
         to: user.email,
         subject: 'Réinitialisation de votre mot de passe',
         html: `
@@ -150,7 +150,7 @@ const sendOrderConfirmationEmail = async (order, user) => {
         : 'Lien de paiement (envoyé par Stéphane)';
 
     const mailOptions = {
-        from: process.env.SMTP_FROM || '"Casa Steph Iberico" <casastephiberico@gmail.com>',
+        from: process.env.SMTP_FROM || '"Casa Steph Iberico" <casastephmetz@gmail.com>',
         to: user.email,
         subject: `Confirmation de commande ${orderNumber}`,
         html: `
@@ -227,7 +227,7 @@ const sendOrderConfirmationEmail = async (order, user) => {
 
 const sendWelcomeEmail = async (user) => {
     const mailOptions = {
-        from: process.env.SMTP_FROM || '"Casa Steph Iberico" <casastephiberico@gmail.com>',
+        from: process.env.SMTP_FROM || '"Casa Steph Iberico" <casastephmetz@gmail.com>',
         to: user.email,
         subject: 'Bienvenue chez Casa Steph Iberico !',
         html: `
@@ -301,7 +301,7 @@ const sendPaymentLinkEmail = async (order, user, sumupLink) => {
     `).join('') : `<tr><td colspan="3" style="padding: 10px 0; color: #999; font-style: italic;">Détail non disponible</td></tr>`;
 
     const mailOptions = {
-        from: process.env.SMTP_FROM || '"Casa Steph Iberico" <casastephiberico@gmail.com>',
+        from: process.env.SMTP_FROM || '"Casa Steph Iberico" <casastephmetz@gmail.com>',
         to: user.email,
         subject: `Votre lien de paiement sécurisé (${orderNumber})`,
         html: `
