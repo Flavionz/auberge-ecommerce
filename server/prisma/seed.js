@@ -142,12 +142,16 @@ async function main() {
     ];
 
     for (const item of featured) {
-        const exists = await prisma.featuredProduct.findFirst({ where: { title: item.title } });
+        // Remove any duplicate records for this position (safety net)
+        const allAtPosition = await prisma.featuredProduct.findMany({ where: { position: item.position } });
+        if (allAtPosition.length > 1) {
+            const sorted = allAtPosition.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+            await prisma.featuredProduct.deleteMany({ where: { id: { in: sorted.slice(1).map(r => r.id) } } });
+        }
+        const exists = await prisma.featuredProduct.findFirst({ where: { position: item.position } });
         if (exists) {
-            await prisma.featuredProduct.update({
-                where: { id: exists.id },
-                data: { image: item.image, isActive: true },
-            });
+            // Preserve admin customisations — only ensure the record is active
+            await prisma.featuredProduct.update({ where: { id: exists.id }, data: { isActive: true } });
         } else {
             await prisma.featuredProduct.create({ data: { ...item, isActive: true } });
         }
@@ -198,6 +202,14 @@ async function main() {
     console.log('   👤 Admin  : admin@auberge.com  / admin123');
     console.log('   👤 Client : client@auberge.com / client123');
     console.log('');
+    // Reset all auto-increment sequences (prevents unique constraint errors after manual data changes)
+    const tables = ['User', 'Category', 'Product', 'Order', 'FeaturedProduct'];
+    for (const table of tables) {
+        await prisma.$executeRawUnsafe(
+            `SELECT setval(pg_get_serial_sequence('"${table}"', 'id'), COALESCE(MAX(id), 0)) FROM "${table}"`
+        );
+    }
+    console.log('✅ Séquences réinitialisées.');
     console.log('🎉 Seeding terminé.');
 }
 

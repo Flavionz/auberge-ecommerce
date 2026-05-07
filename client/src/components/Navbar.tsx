@@ -12,16 +12,13 @@ export const Navbar = () => {
   const { user } = useContext(AuthContext);
 
   useEffect(() => {
-    setIsScrolled(false);
-  }, [location.pathname]);
-
-  useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
+    handleScroll();
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [location.pathname]);
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -35,7 +32,7 @@ export const Navbar = () => {
             <img
                 src="/logo.png"
                 alt="Casa Steph Iberico Logo"
-                className={`w-auto transition-all duration-300 ${isScrolled ? 'h-10' : 'h-14'}`}
+                className="h-10 w-auto"
             />
             <span className="font-serif text-xl md:text-2xl text-white">
             Casa Steph Iberico

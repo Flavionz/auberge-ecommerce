@@ -285,12 +285,11 @@ app.delete('/api/featured/:id', authenticate, isAdmin, async (req, res) => {
     try {
         const { id } = req.params;
 
-        await prisma.featuredProduct.update({
-            where: { id: parseInt(id) },
-            data: { isActive: false }
+        await prisma.featuredProduct.delete({
+            where: { id: parseInt(id) }
         });
 
-        res.json({ message: 'Produit vitrine désactivé avec succès' });
+        res.json({ message: 'Produit vitrine supprimé avec succès' });
     } catch (error) {
         console.error('Failed to delete featured product:', error);
         res.status(500).json({ error: 'Erreur lors de la suppression' });
