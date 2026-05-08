@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter, useLocation } from 'react-router-dom';
+import { BrowserRouter, useLocation, useNavigationType } from 'react-router-dom';
 import { AppRouter } from './AppRouter';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
@@ -10,9 +10,11 @@ import { CookieBanner } from './components/cookies/CookieBanner';
 
 const ScrollToTop = () => {
     const { pathname } = useLocation();
+    const navigationType = useNavigationType();
     useEffect(() => {
+        if (navigationType === 'POP') return;
         window.scrollTo({ top: 0, behavior: 'instant' });
-    }, [pathname]);
+    }, [pathname, navigationType]);
     return null;
 };
 

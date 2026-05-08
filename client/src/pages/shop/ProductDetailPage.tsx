@@ -111,7 +111,7 @@ export const ProductDetailPage = () => {
 
                     {/* Breadcrumb / Back */}
                     <button
-                        onClick={() => navigate('/boutique')}
+                        onClick={() => navigate(-1)}
                         className="flex items-center gap-2 text-gray-400 hover:text-[#Cca43b] transition-colors mb-8 group"
                     >
                         <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />

@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { Navbar } from '../../components/Navbar';
 import { CartContext } from '../../contexts/CartContext';
@@ -35,6 +35,17 @@ export const BoutiquePage = () => {
 
   const { addToCart } = useContext(CartContext);
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    const cat = searchParams.get('category');
+    if (!cat || cat === 'all') {
+      setSelectedCategory('all');
+    } else {
+      const num = parseInt(cat, 10);
+      setSelectedCategory(isNaN(num) ? 'all' : num);
+    }
+  }, [searchParams]);
 
 
   useEffect(() => {
@@ -71,7 +82,11 @@ export const BoutiquePage = () => {
   });
 
   const handleCategorySelect = (categoryId: string | number) => {
-    setSelectedCategory(categoryId);
+    if (categoryId === 'all') {
+      setSearchParams({});
+    } else {
+      setSearchParams({ category: String(categoryId) });
+    }
   };
 
   const handleAddToCart = (product: Product) => {
