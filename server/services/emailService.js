@@ -700,6 +700,91 @@ const sendPaymentConfirmedEmail = async (order, user) => {
     }
 };
 
+const sendAdminNewOrderEmail = async (order, customer) => {
+    const adminEmail = process.env.ADMIN_EMAIL || process.env.SMTP_USER;
+    if (!adminEmail) return;
+
+    const orderNumber = `AE-${order.id.toString().padStart(6, '0')}`;
+    const backendUrl = process.env.FRONTEND_URL || 'https://casa-steph-iberico.vercel.app';
+    const adminOrdersUrl = `${backendUrl}/admin/orders`;
+
+    let items = [];
+    try {
+        items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
+        if (typeof items === 'string') items = JSON.parse(items);
+    } catch (_) { items = []; }
+
+    const itemsHtml = items.map(item => `
+        <tr>
+          <td style="padding: 8px 0; border-bottom: 1px solid #eee; color: #333;">${item.name}</td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #eee; text-align: center; color: #666;">×${item.quantity}</td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #eee; text-align: right; font-weight: 600;">${(item.price * item.quantity).toFixed(2)} €</td>
+        </tr>
+    `).join('');
+
+    const contactLabel = order.contactPreference === 'whatsapp' ? 'WhatsApp' : 'Email';
+
+    const mailOptions = {
+        from: process.env.SMTP_FROM || '"Casa Steph Iberico" <casastephmetz@gmail.com>',
+        to: adminEmail,
+        subject: `🛒 Nouvelle commande ${orderNumber} (${order.total.toFixed(2)} €)`,
+        html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+
+        <div style="background-color: #1a1714; padding: 28px 30px; text-align: center;">
+          <h1 style="color: #C9A66B; margin: 0; font-size: 22px; letter-spacing: 1px;">Casa Steph Iberico</h1>
+          <p style="color: #aaa; margin: 8px 0 0; font-size: 13px;">Nouvelle commande reçue</p>
+        </div>
+
+        <div style="padding: 30px;">
+
+          <div style="background-color: #fff8ee; border-left: 4px solid #C9A66B; padding: 16px 20px; border-radius: 0 8px 8px 0; margin-bottom: 24px;">
+            <p style="margin: 0; font-size: 18px; font-weight: bold; color: #1a1714;">Commande ${orderNumber}</p>
+            <p style="margin: 6px 0 0; color: #666; font-size: 13px;">Total : <strong style="color: #1a1714;">${order.total.toFixed(2)} €</strong></p>
+          </div>
+
+          <h3 style="color: #333; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">Client</h3>
+          <table style="width: 100%; margin-bottom: 24px;">
+            <tr><td style="padding: 4px 0; color: #666; font-size: 14px; width: 140px;">Nom</td><td style="font-size: 14px; color: #333;">${customer.firstName || ''} ${customer.lastName || ''}</td></tr>
+            <tr><td style="padding: 4px 0; color: #666; font-size: 14px;">Email</td><td style="font-size: 14px; color: #333;">${customer.email}</td></tr>
+            <tr><td style="padding: 4px 0; color: #666; font-size: 14px;">Téléphone</td><td style="font-size: 14px; color: #333;">${order.phone}</td></tr>
+            <tr><td style="padding: 4px 0; color: #666; font-size: 14px;">Adresse</td><td style="font-size: 14px; color: #333;">${order.deliveryAddress}, ${order.postalCode}</td></tr>
+            <tr><td style="padding: 4px 0; color: #666; font-size: 14px;">Contact préféré</td><td style="font-size: 14px; color: #333; font-weight: bold;">${contactLabel}</td></tr>
+          </table>
+
+          <h3 style="color: #333; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">Articles commandés</h3>
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
+            ${itemsHtml}
+            <tr>
+              <td colspan="2" style="padding: 12px 0 4px; font-weight: bold; color: #333;">Total</td>
+              <td style="padding: 12px 0 4px; text-align: right; font-weight: bold; font-size: 16px; color: #1a1714;">${order.total.toFixed(2)} €</td>
+            </tr>
+          </table>
+
+          ${order.notes ? `<div style="background-color: #f9f9f9; padding: 12px 16px; border-radius: 6px; margin-bottom: 24px;"><p style="margin: 0; font-size: 13px; color: #666;">Note : ${order.notes}</p></div>` : ''}
+
+          <div style="text-align: center; margin-top: 28px;">
+            <a href="${adminOrdersUrl}" style="display: inline-block; background-color: #C9A66B; color: #1a1714; padding: 13px 30px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 14px; letter-spacing: 0.5px;">
+              Gérer la commande
+            </a>
+          </div>
+
+        </div>
+
+        <div style="background-color: #f5f5f5; padding: 16px; text-align: center; border-top: 1px solid #eee;">
+          <p style="margin: 0; color: #999; font-size: 12px;">Casa Steph Iberico · Administration</p>
+        </div>
+
+      </div>`,
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+    } catch (error) {
+        console.error('❌ Admin new order email failed:', error);
+    }
+};
+
 module.exports = {
     sendOrderInDeliveryEmail,
     sendOrderDeliveredEmail,
@@ -709,4 +794,5 @@ module.exports = {
     sendPaymentLinkEmail,
     sendPaymentConfirmedEmail,
     sendVerificationEmail,
+    sendAdminNewOrderEmail,
 };

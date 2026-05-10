@@ -1,5 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
-const { sendOrderConfirmationEmail, sendPaymentConfirmedEmail, sendOrderDeliveredEmail } = require('../services/emailService');
+const { sendOrderConfirmationEmail, sendPaymentConfirmedEmail, sendOrderDeliveredEmail, sendAdminNewOrderEmail } = require('../services/emailService');
 const { generateInvoicePDF, generateInvoiceNumber } = require('../services/invoiceService');
 
 const prisma = new PrismaClient();
@@ -125,6 +125,8 @@ const createOrder = async (req, res) => {
 
         // Send order confirmation email (non-blocking)
         sendOrderConfirmationEmail(order, user).catch(err => console.error('Order confirmation email error:', err));
+        // Notify admin of new order (non-blocking)
+        sendAdminNewOrderEmail(order, user).catch(err => console.error('Admin new order email error:', err));
 
         res.status(201).json({
             message: 'Commande créée avec succès',
@@ -245,10 +247,42 @@ const downloadInvoice = async (req, res) => {
     }
 };
 
+const getAdminNotifications = async (req, res) => {
+    try {
+        const unseen = await prisma.order.findMany({
+            where: { adminSeen: false },
+            orderBy: { createdAt: 'desc' },
+            take: 10,
+            include: {
+                user: { select: { firstName: true, lastName: true, email: true } }
+            }
+        });
+        res.json({ count: unseen.length, orders: unseen });
+    } catch (error) {
+        console.error('Get notifications error:', error);
+        res.status(500).json({ error: 'Erreur serveur' });
+    }
+};
+
+const markNotificationsSeen = async (req, res) => {
+    try {
+        await prisma.order.updateMany({
+            where: { adminSeen: false },
+            data: { adminSeen: true }
+        });
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Mark notifications seen error:', error);
+        res.status(500).json({ error: 'Erreur serveur' });
+    }
+};
+
 module.exports = {
     createOrder,
     getUserOrders,
     getAllOrders,
     updateOrderStatus,
-    downloadInvoice
+    downloadInvoice,
+    getAdminNotifications,
+    markNotificationsSeen
 };

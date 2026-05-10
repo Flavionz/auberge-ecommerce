@@ -5,7 +5,9 @@ const {
     getUserOrders,
     getAllOrders,
     updateOrderStatus,
-    downloadInvoice
+    downloadInvoice,
+    getAdminNotifications,
+    markNotificationsSeen
 } = require('../controllers/orderController');
 
 const router = express.Router();
@@ -13,6 +15,8 @@ const router = express.Router();
 router.post('/create', authenticate, createOrder);
 router.get('/user', authenticate, getUserOrders);
 router.get('/all', authenticate, isAdmin, getAllOrders);
+router.get('/admin/notifications', authenticate, isAdmin, getAdminNotifications);
+router.post('/admin/notifications/mark-seen', authenticate, isAdmin, markNotificationsSeen);
 router.put('/:id/status', authenticate, isAdmin, updateOrderStatus);
 router.get('/:id/invoice', authenticate, downloadInvoice);
 

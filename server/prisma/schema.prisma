@@ -51,6 +51,7 @@ model Order {
   deliveryTimeSlot  String?
   deliveryDate      String?
   invoiceNumber     String?  @unique
+  adminSeen         Boolean  @default(false)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 }

@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { Menu } from 'lucide-react';
 import { AdminSidebar } from './AdminSidebar';
+import { NotificationBell } from './NotificationBell';
 import { AuthContext } from '../../contexts/AuthContext';
 
 interface AdminLayoutProps {
@@ -46,6 +47,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                         </div>
 
                         <div className="flex items-center space-x-3 shrink-0">
+                            <NotificationBell />
                             <div className="text-right hidden sm:block">
                                 <p className="text-sm font-medium text-gray-700">{user?.email}</p>
                                 <p className="text-xs text-gray-500 capitalize">{user?.role}</p>
