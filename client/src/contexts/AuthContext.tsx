@@ -22,7 +22,7 @@ interface AuthContextType {
     isAdmin: boolean;
     isLoading: boolean;
     login: (email: string, password: string) => Promise<void>;
-    register: (email: string, password: string) => Promise<void>;
+    register: (email: string, password: string) => Promise<{ email: string }>;
     logout: () => void;
     updateUser: (partial: Partial<User>) => void;
 }
@@ -32,7 +32,7 @@ export const AuthContext = createContext<AuthContextType>({
     isAdmin: false,
     isLoading: true,
     login: async () => { throw new Error('AuthProvider non trovato'); },
-    register: async () => { throw new Error('AuthProvider non trovato'); },
+    register: async () => { throw new Error('AuthProvider non trovato'); return { email: '' }; },
     logout: () => { throw new Error('AuthProvider non trovato'); },
     updateUser: () => { throw new Error('AuthProvider non trovato'); },
 });
@@ -69,17 +69,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         verifyToken();
     }, []);
 
-    const register = async (email: string, password: string) => {
+    const register = async (email: string, password: string): Promise<{ email: string }> => {
         try {
-            const response = await axios.post(`${API_URL}/auth/register`, {
-                email,
-                password
-            });
-
-            const { user, token } = response.data;
-            localStorage.setItem('authToken', token);
-            setUser(user);
-
+            const response = await axios.post(`${API_URL}/auth/register`, { email, password });
+            return { email: response.data.email };
         } catch (error: any) {
             const errorMessage = error.response?.data?.error || 'Registration failed';
             throw new Error(errorMessage);

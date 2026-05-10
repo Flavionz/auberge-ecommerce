@@ -22,9 +22,11 @@ model User {
   address    String?
   city       String?
   postalCode     String?
-  resetToken     String?  @unique
-  resetTokenUsed Boolean  @default(false)
-  createdAt      DateTime @default(now())
+  resetToken             String?  @unique
+  resetTokenUsed         Boolean  @default(false)
+  isEmailVerified        Boolean  @default(false)
+  emailVerificationToken String?  @unique
+  createdAt              DateTime @default(now())
   orders         Order[]
 }
 

@@ -1,7 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { sendPasswordResetEmail, sendWelcomeEmail } = require('../services/emailService');
+const { sendPasswordResetEmail, sendWelcomeEmail, sendVerificationEmail } = require('../services/emailService');
 
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -39,27 +39,28 @@ const register = async (req, res) => {
             data: {
                 email,
                 password: hashedPassword,
-                role: 'user'
+                role: 'user',
+                isEmailVerified: false,
             }
         });
 
-        const token = jwt.sign(
-            { userId: user.id, email: user.email, role: user.role },
+        const verificationToken = jwt.sign(
+            { userId: user.id, purpose: 'email-verification' },
             JWT_SECRET,
-            { expiresIn: '7d' }
+            { expiresIn: '24h' }
         );
 
-        // Send welcome email (non-blocking)
-        sendWelcomeEmail(user).catch(err => console.error('Welcome email error:', err));
+        await prisma.user.update({
+            where: { id: user.id },
+            data: { emailVerificationToken: verificationToken }
+        });
+
+        const verificationLink = `${CLIENT_URL}/verify-email?token=${verificationToken}`;
+        sendVerificationEmail(user, verificationLink).catch(err => console.error('Verification email error:', err));
 
         res.status(201).json({
-            message: 'Compte créé avec succès',
-            user: {
-                id: user.id,
-                email: user.email,
-                role: user.role
-            },
-            token
+            message: 'Compte créé. Vérifiez votre email pour activer votre compte.',
+            email: user.email,
         });
 
     } catch (error) {
@@ -88,6 +89,14 @@ const login = async (req, res) => {
 
         if (!isPasswordValid) {
             return res.status(401).json({ error: 'Email ou mot de passe incorrect' });
+        }
+
+        if (!user.isEmailVerified) {
+            return res.status(403).json({
+                error: 'Veuillez vérifier votre adresse email avant de vous connecter.',
+                code: 'EMAIL_NOT_VERIFIED',
+                email: user.email,
+            });
         }
 
         const token = jwt.sign(
@@ -231,6 +240,75 @@ const resetPassword = async (req, res) => {
     }
 };
 
+const verifyEmail = async (req, res) => {
+    try {
+        const { token } = req.body;
+        if (!token) return res.status(400).json({ error: 'Token manquant' });
+
+        let decoded;
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+        } catch {
+            return res.status(400).json({ error: 'Lien invalide ou expiré' });
+        }
+
+        if (decoded.purpose !== 'email-verification') {
+            return res.status(400).json({ error: 'Token invalide' });
+        }
+
+        const user = await prisma.user.findFirst({
+            where: { id: decoded.userId, emailVerificationToken: token }
+        });
+
+        if (!user) {
+            return res.status(400).json({ error: 'Lien invalide ou déjà utilisé' });
+        }
+
+        await prisma.user.update({
+            where: { id: user.id },
+            data: { isEmailVerified: true, emailVerificationToken: null }
+        });
+
+        res.json({ message: 'Adresse email vérifiée avec succès.' });
+    } catch (error) {
+        console.error('Verify email error:', error);
+        res.status(500).json({ error: 'Erreur serveur' });
+    }
+};
+
+const resendVerification = async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email) return res.status(400).json({ error: 'Email requis' });
+
+        const user = await prisma.user.findUnique({ where: { email } });
+
+        // Always return success to avoid enumeration
+        if (!user || user.isEmailVerified) {
+            return res.json({ message: 'Si ce compte existe et n\'est pas encore vérifié, un email a été envoyé.' });
+        }
+
+        const verificationToken = jwt.sign(
+            { userId: user.id, purpose: 'email-verification' },
+            JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+
+        await prisma.user.update({
+            where: { id: user.id },
+            data: { emailVerificationToken: verificationToken }
+        });
+
+        const verificationLink = `${CLIENT_URL}/verify-email?token=${verificationToken}`;
+        sendVerificationEmail(user, verificationLink).catch(err => console.error('Resend verification error:', err));
+
+        res.json({ message: 'Email de vérification renvoyé.' });
+    } catch (error) {
+        console.error('Resend verification error:', error);
+        res.status(500).json({ error: 'Erreur serveur' });
+    }
+};
+
 module.exports = {
     register,
     login,
@@ -238,4 +316,6 @@ module.exports = {
     logout,
     forgotPassword,
     resetPassword,
+    verifyEmail,
+    resendVerification,
 };

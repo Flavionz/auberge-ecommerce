@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
 import axios from 'axios';
 import { API_URL } from '../../config/api';
 
@@ -10,6 +11,8 @@ export const ResetPasswordPage: React.FC = () => {
 
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [showNew, setShowNew] = useState(false);
+    const [showConfirm, setShowConfirm] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
@@ -35,8 +38,8 @@ export const ResetPasswordPage: React.FC = () => {
             setError('Les mots de passe ne correspondent pas.');
             return;
         }
-        if (newPassword.length < 6) {
-            setError('Le mot de passe doit contenir au moins 6 caractères.');
+        if (newPassword.length < 8) {
+            setError('Le mot de passe doit contenir au moins 8 caractères.');
             return;
         }
 
@@ -92,32 +95,52 @@ export const ResetPasswordPage: React.FC = () => {
                                     <label htmlFor="newPassword" className="block text-sm text-gray-300 mb-2 tracking-wide">
                                         Nouveau mot de passe
                                     </label>
-                                    <input
-                                        id="newPassword"
-                                        type="password"
-                                        value={newPassword}
-                                        onChange={e => setNewPassword(e.target.value)}
-                                        required
-                                        disabled={isLoading}
-                                        className="w-full bg-transparent border-b border-gray-600 text-white py-2 px-1 focus:outline-none focus:border-gold transition-colors duration-300"
-                                        placeholder="••••••••"
-                                    />
+                                    <div className="relative">
+                                        <input
+                                            id="newPassword"
+                                            type={showNew ? 'text' : 'password'}
+                                            value={newPassword}
+                                            onChange={e => setNewPassword(e.target.value)}
+                                            required
+                                            disabled={isLoading}
+                                            className="w-full bg-transparent border-b border-gray-600 text-white py-2 px-1 pr-8 focus:outline-none focus:border-gold transition-colors duration-300"
+                                            placeholder="••••••••"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowNew(!showNew)}
+                                            className="absolute right-1 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+                                            tabIndex={-1}
+                                        >
+                                            {showNew ? <EyeOff size={16} /> : <Eye size={16} />}
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <div>
                                     <label htmlFor="confirmPassword" className="block text-sm text-gray-300 mb-2 tracking-wide">
                                         Confirmer le mot de passe
                                     </label>
-                                    <input
-                                        id="confirmPassword"
-                                        type="password"
-                                        value={confirmPassword}
-                                        onChange={e => setConfirmPassword(e.target.value)}
-                                        required
-                                        disabled={isLoading}
-                                        className="w-full bg-transparent border-b border-gray-600 text-white py-2 px-1 focus:outline-none focus:border-gold transition-colors duration-300"
-                                        placeholder="••••••••"
-                                    />
+                                    <div className="relative">
+                                        <input
+                                            id="confirmPassword"
+                                            type={showConfirm ? 'text' : 'password'}
+                                            value={confirmPassword}
+                                            onChange={e => setConfirmPassword(e.target.value)}
+                                            required
+                                            disabled={isLoading}
+                                            className="w-full bg-transparent border-b border-gray-600 text-white py-2 px-1 pr-8 focus:outline-none focus:border-gold transition-colors duration-300"
+                                            placeholder="••••••••"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowConfirm(!showConfirm)}
+                                            className="absolute right-1 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+                                            tabIndex={-1}
+                                        >
+                                            {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <button

@@ -42,7 +42,7 @@ const sendOrderInDeliveryEmail = async (order, user) => {
     const mailOptions = {
         from: process.env.SMTP_FROM || '"Casa Steph Iberico" <casastephmetz@gmail.com>',
         to: user.email,
-        subject: `Votre commande est en route — ${orderNumber}`,
+        subject: `Votre commande est en route (${orderNumber})`,
         html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
 
@@ -133,7 +133,7 @@ const sendOrderDeliveredEmail = async (order, user) => {
     const mailOptions = {
         from: process.env.SMTP_FROM || '"Casa Steph Iberico" <casastephmetz@gmail.com>',
         to: user.email,
-        subject: `Commande livrée — Merci pour votre confiance !`,
+        subject: `Commande livrée, merci pour votre confiance !`,
         html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
 
@@ -145,7 +145,7 @@ const sendOrderDeliveredEmail = async (order, user) => {
         <div style="padding: 40px 30px;">
 
           <h2 style="color: #1a1714; margin-top: 0;">
-            Commande livrée — merci ${user.firstName ? user.firstName : ''} !
+            Commande livrée, merci ${user.firstName ? user.firstName : ''} !
           </h2>
 
           <p style="color: #444; font-size: 15px; line-height: 1.6;">
@@ -156,7 +156,7 @@ const sendOrderDeliveredEmail = async (order, user) => {
           <div style="background-color: #f9f6f2; border-left: 4px solid #C9A66B; padding: 18px 20px; margin: 25px 0; border-radius: 0 8px 8px 0;">
             <p style="margin: 0; font-size: 14px; color: #444; line-height: 1.7;">
               Si quelque chose ne correspond pas à vos attentes, ou si vous avez la moindre question
-              sur votre commande, n'hésitez pas à nous contacter directement — nous sommes là pour vous.
+              sur votre commande, n'hésitez pas à nous contacter directement : nous sommes là pour vous.
             </p>
           </div>
 
@@ -218,7 +218,7 @@ const sendPasswordResetEmail = async (user, resetLink) => {
         </div>
         <p style="color: #888; font-size: 13px;">Si vous n'avez pas fait cette demande, ignorez cet email. Votre mot de passe ne sera pas modifié.</p>
         <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
-        <p style="font-size: 12px; color: #666;">Casa Steph Iberico — casastephiberico@gmail.com</p>
+        <p style="font-size: 12px; color: #666;">Casa Steph Iberico · casastephiberico@gmail.com</p>
       </div>
     `,
     };
@@ -306,7 +306,7 @@ const sendOrderConfirmationEmail = async (order, user) => {
 
         <div style="background-color: #f5f5f5; padding: 20px 30px; text-align: center;">
           <p style="margin: 0; font-size: 12px; color: #999;">
-            Casa Steph Iberico — Metz, France<br>
+            Casa Steph Iberico, Metz, France<br>
             <a href="${process.env.CLIENT_URL || 'http://localhost:5173'}" style="color: #C9A66B; text-decoration: none;">casasteph.fr</a>
           </p>
         </div>
@@ -360,7 +360,7 @@ const sendWelcomeEmail = async (user) => {
 
         <div style="background-color: #f5f5f5; padding: 20px 30px; text-align: center;">
           <p style="margin: 0; font-size: 12px; color: #999;">
-            Casa Steph Iberico — Metz, France<br>
+            Casa Steph Iberico, Metz, France<br>
             <a href="${process.env.CLIENT_URL || 'http://localhost:5173'}" style="color: #C9A66B; text-decoration: none;">casasteph.fr</a>
           </p>
         </div>
@@ -510,6 +510,80 @@ const sendPaymentLinkEmail = async (order, user, sumupLink) => {
     }
 };
 
+const sendVerificationEmail = async (user, verificationLink) => {
+    const mailOptions = {
+        from: process.env.SMTP_FROM || '"Casa Steph Iberico" <casastephmetz@gmail.com>',
+        to: user.email,
+        subject: 'Activez votre compte Casa Steph Iberico',
+        html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+
+        <div style="background-color: #1a1714; padding: 32px 30px; text-align: center;">
+          <h1 style="color: #C9A66B; margin: 0; font-size: 26px; letter-spacing: 1px;">Casa Steph Iberico</h1>
+          <p style="color: #888; margin: 6px 0 0 0; font-size: 13px;">Charcuterie & fromages ibériques · Metz</p>
+        </div>
+
+        <div style="padding: 40px 30px;">
+
+          <h2 style="color: #1a1714; margin-top: 0;">
+            Bienvenue${user.firstName ? ' ' + user.firstName : ''}, plus qu'une étape !
+          </h2>
+
+          <p style="color: #444; font-size: 15px; line-height: 1.6;">
+            Merci de vous être inscrit(e) sur notre boutique en ligne. Pour activer votre compte
+            et commencer à commander, veuillez confirmer votre adresse email en cliquant sur le bouton ci-dessous.
+          </p>
+
+          <div style="text-align: center; margin: 40px 0 30px 0;">
+            <a href="${verificationLink}"
+               style="background-color: #C9A66B; color: #1a1714; padding: 16px 44px; border-radius: 4px; text-decoration: none; font-weight: bold; font-size: 16px; display: inline-block;">
+              Confirmer mon adresse email
+            </a>
+          </div>
+
+          <p style="color: #888; font-size: 12px; text-align: center; margin-bottom: 30px;">
+            Ce lien est valable <strong>24 heures</strong>. Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :<br>
+            <a href="${verificationLink}" style="color: #C9A66B; word-break: break-all; font-size: 11px;">${verificationLink}</a>
+          </p>
+
+          <div style="background-color: #fff8e7; border-left: 4px solid #f59e0b; padding: 14px 18px; border-radius: 0 8px 8px 0; margin-bottom: 24px;">
+            <p style="margin: 0; font-size: 13px; color: #92400e;">
+              Si vous n'avez pas créé de compte sur notre boutique, ignorez simplement cet email.
+            </p>
+          </div>
+
+          <p style="color: #666; font-size: 14px;">
+            Des questions ? Contactez-nous à
+            <a href="mailto:casastephiberico@gmail.com" style="color: #C9A66B;">casastephiberico@gmail.com</a>.
+          </p>
+
+          <p style="margin-top: 30px; color: #444; font-size: 14px;">
+            À très bientôt,<br>
+            <strong>L'équipe Casa Steph Iberico</strong>
+          </p>
+        </div>
+
+        <div style="background-color: #f5f5f5; padding: 20px 30px; text-align: center;">
+          <p style="margin: 0; font-size: 12px; color: #999;">
+            Casa Steph Iberico, Metz, France<br>
+            <a href="mailto:casastephiberico@gmail.com" style="color: #C9A66B; text-decoration: none;">casastephiberico@gmail.com</a>
+          </p>
+        </div>
+
+      </div>
+    `,
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log(`✅ Verification email sent to ${user.email}`);
+        return { success: true };
+    } catch (error) {
+        console.error('❌ Verification email failed:', error);
+        return { success: false, error };
+    }
+};
+
 const sendPaymentConfirmedEmail = async (order, user) => {
     const orderNumber = `AE-${order.id.toString().padStart(6, '0')}`;
     const frontendUrl = process.env.FRONTEND_URL || 'https://casa-steph-iberico.vercel.app';
@@ -536,7 +610,7 @@ const sendPaymentConfirmedEmail = async (order, user) => {
     const mailOptions = {
         from: process.env.SMTP_FROM || '"Casa Steph Iberico" <casastephmetz@gmail.com>',
         to: user.email,
-        subject: `Paiement confirmé — ${orderNumber} ✓`,
+        subject: `Paiement confirmé pour votre commande ${orderNumber} ✓`,
         html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
 
@@ -634,4 +708,5 @@ module.exports = {
     sendOrderConfirmationEmail,
     sendPaymentLinkEmail,
     sendPaymentConfirmedEmail,
+    sendVerificationEmail,
 };

@@ -28,6 +28,7 @@ import { ConfidentialitePage } from './pages/legal/ConfidentialitePage';
 import { LivraisonPaiementPage } from './pages/legal/LivraisonPaiementPage';
 import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage';
 import { ResetPasswordPage } from './pages/auth/ResetPasswordPage';
+import { VerifyEmailPage } from './pages/auth/VerifyEmailPage';
 
 
 
@@ -43,6 +44,7 @@ export const AppRouter: React.FC = () => {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/verify-email" element={<VerifyEmailPage />} />
 
             <Route path="/boutique" element={
                 <FrontendLayout>
