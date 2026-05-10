@@ -95,8 +95,8 @@ export const Footer = () => {
           </div>
 
           <div className="border-t border-gray-800 mt-8 pt-8 text-center">
-            <p className="text-gray-500 text-xs">
-              &copy; {new Date().getFullYear()} Casa Steph Iberico made by Flavio Terenzi. Tous droits réservés.
+            <p className="text-gray-300 text-sm">
+              &copy; {new Date().getFullYear()} Casa Steph Iberico made by <a href="https://flavioterenzi.vercel.app/" target="_blank" rel="noopener noreferrer" className="text-white hover:text-gold transition-colors">Flavio Terenzi</a>. Tous droits réservés.
             </p>
           </div>
         </div>
