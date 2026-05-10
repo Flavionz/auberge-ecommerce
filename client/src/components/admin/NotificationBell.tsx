@@ -35,7 +35,7 @@ export const NotificationBell: React.FC = () => {
     const fetchNotifications = useCallback(async () => {
         try {
             const { data } = await axios.get(`${API_URL}/orders/admin/notifications`, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                headers: { Authorization: `Bearer ${localStorage.getItem('authToken')}` }
             });
             setCount(data.count);
             setOrders(data.orders);
@@ -65,7 +65,7 @@ export const NotificationBell: React.FC = () => {
         if (!open && count > 0) {
             try {
                 await axios.post(`${API_URL}/orders/admin/notifications/mark-seen`, {}, {
-                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                    headers: { Authorization: `Bearer ${localStorage.getItem('authToken')}` }
                 });
                 setCount(0);
             } catch {
