@@ -11,7 +11,7 @@ const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const orderRoutes = require('./routes/orders');
 const paymentRoutes = require('./routes/payments');
-const { sendOrderReadyEmail, sendOrderDeliveredEmail, sendPaymentLinkEmail } = require('./services/emailService');
+const { sendOrderInDeliveryEmail, sendOrderDeliveredEmail, sendPaymentLinkEmail } = require('./services/emailService');
 const { authenticate, isAdmin } = require('./middleware/authMiddleware');
 
 const app = express();
@@ -526,6 +526,10 @@ app.put('/api/orders/:id/delivery', authenticate, isAdmin, async (req, res) => {
             }
         });
 
+        if (order.user) {
+            sendOrderInDeliveryEmail(order, order.user).catch(err => console.error('In-delivery email error:', err));
+        }
+
         res.json({
             ...order,
             message: 'Créneau de livraison défini'
@@ -597,7 +601,7 @@ app.post('/api/orders/:id/notify', authenticate, isAdmin, async (req, res) => {
 
         let result;
         if (type === 'ready') {
-            result = await sendOrderReadyEmail(order, order.user);
+            result = await sendOrderInDeliveryEmail(order, order.user);
         } else if (type === 'delivered') {
             result = await sendOrderDeliveredEmail(order, order.user);
         } else {

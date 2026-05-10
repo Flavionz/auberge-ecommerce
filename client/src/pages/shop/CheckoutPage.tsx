@@ -511,7 +511,7 @@ export const CheckoutPage = () => {
                                                 </p>
                                             </div>
                                             <p className="text-xs text-blue-400">
-                                                Après confirmation de votre commande, Stéphane vous enverra un lien de paiement sécurisé.
+                                                Après confirmation de votre commande, notre équipe vous enverra un lien de paiement sécurisé.
                                             </p>
                                         </div>
                                     )}

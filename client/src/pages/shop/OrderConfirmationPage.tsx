@@ -104,7 +104,7 @@ export const OrderConfirmationPage = () => {
                             <div>
                                 <p className="text-gray-400 text-sm mb-1">Mode de paiement</p>
                                 <p className="text-white">
-                                    {orderData.paymentMethod === 'cash' ? 'Espèces à la livraison' : 'Lien de paiement (envoyé par Stéphane)'}
+                                    {orderData.paymentMethod === 'cash' ? 'Espèces à la livraison' : 'Lien de paiement sécurisé'}
                                 </p>
                             </div>
                         </div>
@@ -130,7 +130,7 @@ export const OrderConfirmationPage = () => {
                                     <div className="flex-shrink-0 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">2</div>
                                     <div>
                                         <p className="text-white font-medium">Lien de paiement</p>
-                                        <p className="text-gray-300 text-sm">Stéphane vous enverra un lien de paiement sécurisé dès que votre commande sera validée.</p>
+                                        <p className="text-gray-300 text-sm">Notre équipe vous enverra un lien de paiement sécurisé dès que votre commande sera validée.</p>
                                     </div>
                                 </div>
                             )}
@@ -161,7 +161,7 @@ export const OrderConfirmationPage = () => {
                                 </div>
                                 <div>
                                     <p className="text-white font-medium">Livraison à domicile</p>
-                                    <p className="text-gray-300 text-sm">Stéphane livre directement à votre adresse.</p>
+                                    <p className="text-gray-300 text-sm">Notre équipe livre directement à votre adresse.</p>
                                 </div>
                             </div>
                         </div>

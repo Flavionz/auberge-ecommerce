@@ -29,7 +29,7 @@ interface DashboardStats {
 const STATUS_LABELS: Record<string, string> = {
     en_attente: 'En Attente',
     en_preparation: 'En Préparation',
-    pret_pour_livraison: 'Prêt pour Livraison',
+    pret_pour_livraison: 'En livraison',
     livre: 'Livré',
     annule: 'Annulé',
 };

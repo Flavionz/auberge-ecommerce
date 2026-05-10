@@ -37,7 +37,7 @@ const STATUS_CONFIG = {
     lien_envoye:         { label: 'Lien envoyé',      color: 'bg-purple-500',  badge: 'bg-purple-100 text-purple-800',  icon: Send },
     paye:                { label: 'Payé',              color: 'bg-emerald-500', badge: 'bg-emerald-100 text-emerald-800', icon: Euro },
     en_preparation:      { label: 'En préparation',   color: 'bg-blue-500',    badge: 'bg-blue-100 text-blue-800',      icon: Package },
-    pret_pour_livraison: { label: 'Prêt à livrer',    color: 'bg-green-500',   badge: 'bg-green-100 text-green-800',    icon: Truck },
+    pret_pour_livraison: { label: 'En livraison',      color: 'bg-green-500',   badge: 'bg-green-100 text-green-800',    icon: Truck },
     livre:               { label: 'Livré',             color: 'bg-gray-500',    badge: 'bg-gray-100 text-gray-700',      icon: CheckCircle },
     annule:              { label: 'Annulé',            color: 'bg-red-500',     badge: 'bg-red-100 text-red-800',        icon: XCircle },
 } as const;

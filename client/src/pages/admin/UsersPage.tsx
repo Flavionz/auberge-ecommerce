@@ -35,7 +35,7 @@ interface UserDetail extends UserSummary {
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
     en_attente:          { label: 'En attente',         color: 'bg-yellow-100 text-yellow-800' },
     en_preparation:      { label: 'En préparation',     color: 'bg-blue-100 text-blue-800' },
-    pret_pour_livraison: { label: 'Prêt à livrer',      color: 'bg-purple-100 text-purple-800' },
+    pret_pour_livraison: { label: 'En livraison',        color: 'bg-purple-100 text-purple-800' },
     livre:               { label: 'Livré',               color: 'bg-green-100 text-green-800' },
     annule:              { label: 'Annulé',              color: 'bg-red-100 text-red-800' },
 };

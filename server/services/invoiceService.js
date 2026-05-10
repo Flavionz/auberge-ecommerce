@@ -156,22 +156,32 @@ const generateInvoicePDF = (order, user, res) => {
         y += 16;
     }
 
+    // ── Détail TVA (dont TVA X%) ─────────────────────────────────────────────────
+    const tvaByRate = {};
+    items.forEach(item => {
+        const rate = item.tvaRate ?? 5.5;
+        const lineTotal = item.price * item.quantity;
+        const tvaAmount = lineTotal * rate / (100 + rate);
+        tvaByRate[rate] = (tvaByRate[rate] || 0) + tvaAmount;
+    });
+
+    const sortedRates = Object.keys(tvaByRate).map(Number).sort((a, b) => a - b);
+    sortedRates.forEach(rate => {
+        const rateLabel = rate % 1 === 0 ? `${rate}` : `${rate}`.replace('.', ',');
+        doc.fillColor(GRAY).font('Helvetica').fontSize(9)
+           .text(`dont TVA ${rateLabel} % :`, 350, y, { width: 120, align: 'right' });
+        doc.fillColor('#111827').text(`${tvaByRate[rate].toFixed(2)} €`, colTotal, y, { width: 60, align: 'right' });
+        y += 16;
+    });
+
+    y += 4;
+
     // Total final
     doc.rect(350, y, doc.page.width - 400, 26).fill(DARK);
     doc.fillColor(GOLD).font('Helvetica-Bold').fontSize(11)
        .text('TOTAL TTC :', 354, y + 7, { width: 116, align: 'right' });
     doc.fillColor('#FFFFFF').text(`${order.total.toFixed(2)} €`, colTotal, y + 7, { width: 60, align: 'right' });
     y += 40;
-
-    // ── Mention TVA ──────────────────────────────────────────────────────────────
-    doc.rect(50, y, doc.page.width - 100, 28).fill('#FEF9EC');
-    doc.fillColor('#92400E').font('Helvetica').fontSize(8)
-       .text(
-           'TVA non applicable — article 293 B du CGI',
-           54, y + 10,
-           { width: doc.page.width - 108 }
-       );
-    y += 44;
 
     // ── Mode de paiement ─────────────────────────────────────────────────────────
     const paymentLabel = order.paymentMethod === 'cash'

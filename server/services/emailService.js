@@ -10,92 +10,191 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-const sendOrderReadyEmail = async (order, user) => {
-    const items = JSON.parse(order.items);
-    const itemsList = items.map(item =>
-        `- ${item.name} x${item.quantity} - ${(item.price * item.quantity).toFixed(2)}€`
-    ).join('\n');
+const sendOrderInDeliveryEmail = async (order, user) => {
+    const orderNumber = `AE-${order.id.toString().padStart(6, '0')}`;
+    const frontendUrl = process.env.FRONTEND_URL || 'https://casa-steph-iberico.vercel.app';
+    const invoiceUrl = `${frontendUrl}/account/orders/${order.id}`;
+
+    let items = [];
+    try {
+        items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
+        if (typeof items === 'string') items = JSON.parse(items);
+    } catch (_) { items = []; }
+
+    const itemsHtml = items.length > 0 ? items.map(item => `
+        <tr>
+          <td style="padding: 9px 0; border-bottom: 1px solid #eee; color: #333;">${item.name}</td>
+          <td style="padding: 9px 0; border-bottom: 1px solid #eee; text-align: center; color: #666;">×${item.quantity}</td>
+          <td style="padding: 9px 0; border-bottom: 1px solid #eee; text-align: right; font-weight: 600; color: #1a1714;">${(item.price * item.quantity).toFixed(2)} €</td>
+        </tr>
+    `).join('') : '';
+
+    const deliveryBlock = order.deliveryDate && order.deliveryTimeSlot
+        ? `<div style="background-color: #f0f7f0; border-left: 4px solid #4caf50; padding: 18px 20px; margin: 25px 0; border-radius: 0 8px 8px 0;">
+            <p style="margin: 0 0 6px 0; font-size: 14px;"><strong>📅 Date de livraison :</strong> ${order.deliveryDate}</p>
+            <p style="margin: 0 0 6px 0; font-size: 14px;"><strong>🕐 Créneau :</strong> ${order.deliveryTimeSlot}</p>
+            <p style="margin: 0; font-size: 14px;"><strong>📍 Adresse :</strong> ${order.deliveryAddress}, ${order.postalCode}</p>
+          </div>`
+        : `<div style="background-color: #f0f7f0; border-left: 4px solid #4caf50; padding: 18px 20px; margin: 25px 0; border-radius: 0 8px 8px 0;">
+            <p style="margin: 0; font-size: 14px;"><strong>📍 Adresse de livraison :</strong> ${order.deliveryAddress}, ${order.postalCode}</p>
+          </div>`;
 
     const mailOptions = {
         from: process.env.SMTP_FROM || '"Casa Steph Iberico" <casastephmetz@gmail.com>',
         to: user.email,
-        subject: `Votre commande #${order.id} est prête! 🎉`,
+        subject: `Votre commande est en route — ${orderNumber}`,
         html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #C9A66B;">Excellente nouvelle!</h2>
-        
-        <p>Bonjour ${user.firstName},</p>
-        
-        <p>Votre commande est prête et sera livrée :</p>
-        
-        <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
-          <p style="margin: 5px 0;"><strong>📅 Date:</strong> ${order.deliveryDate}</p>
-          <p style="margin: 5px 0;"><strong>🕐 Créneau horaire:</strong> ${order.deliveryTimeSlot}</p>
-          <p style="margin: 5px 0;"><strong>📍 Adresse:</strong> ${order.deliveryAddress}, ${order.postalCode}</p>
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+
+        <div style="background-color: #1a1714; padding: 32px 30px; text-align: center;">
+          <h1 style="color: #C9A66B; margin: 0; font-size: 26px; letter-spacing: 1px;">Casa Steph Iberico</h1>
+          <p style="color: #888; margin: 6px 0 0 0; font-size: 13px;">Charcuterie & fromages ibériques · Metz</p>
         </div>
-        
-        <h3 style="color: #C9A66B;">Détails de votre commande #${order.id}</h3>
-        <pre style="background-color: #f5f5f5; padding: 15px; border-radius: 8px;">
-${itemsList}
-        </pre>
-        
-        <p style="font-size: 18px; font-weight: bold; margin-top: 20px;">
-          Total: ${order.total.toFixed(2)}€
-        </p>
-        
-        <p style="margin-top: 30px;">À très bientôt,<br><strong>Casa Steph Iberico</strong></p>
-        
-        <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
-        
-        <p style="font-size: 12px; color: #666;">
-          Pour toute question, contactez-nous à casastephiberico@gmail.com
-        </p>
+
+        <div style="padding: 40px 30px;">
+
+          <h2 style="color: #1a1714; margin-top: 0;">
+            Votre commande est en livraison, ${user.firstName ? user.firstName : ''} !
+          </h2>
+
+          <p style="color: #444; font-size: 15px; line-height: 1.6;">
+            Bonne nouvelle ! Votre commande <strong>${orderNumber}</strong> a été soigneusement préparée et
+            est maintenant en route vers chez vous.
+          </p>
+
+          ${deliveryBlock}
+
+          <h3 style="color: #1a1714; border-bottom: 2px solid #C9A66B; padding-bottom: 8px; font-size: 15px;">Récapitulatif</h3>
+          <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+            <thead>
+              <tr style="color: #999; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">
+                <th style="text-align: left; padding-bottom: 8px;">Produit</th>
+                <th style="text-align: center; padding-bottom: 8px;">Qté</th>
+                <th style="text-align: right; padding-bottom: 8px;">Prix</th>
+              </tr>
+            </thead>
+            <tbody>${itemsHtml}</tbody>
+          </table>
+          <table style="width: 100%; margin-top: 10px; font-size: 14px;">
+            ${order.deliveryFee > 0
+                ? `<tr><td style="padding: 4px 0; color: #666;">Livraison</td><td style="text-align: right; color: #666;">${Number(order.deliveryFee).toFixed(2)} €</td></tr>`
+                : `<tr><td style="padding: 4px 0; color: #666;">Livraison</td><td style="text-align: right; color: #2e7d32; font-weight: 600;">Gratuite</td></tr>`
+            }
+            <tr>
+              <td style="padding: 10px 0 0 0; font-size: 17px; font-weight: bold; color: #1a1714;">Total</td>
+              <td style="text-align: right; padding-top: 10px; font-size: 17px; font-weight: bold; color: #C9A66B;">${order.total.toFixed(2)} €</td>
+            </tr>
+          </table>
+
+          <div style="text-align: center; margin: 40px 0 30px 0;">
+            <a href="${invoiceUrl}"
+               style="background-color: #C9A66B; color: #1a1714; padding: 16px 44px; border-radius: 4px; text-decoration: none; font-weight: bold; font-size: 16px; display: inline-block;">
+              Télécharger ma facture
+            </a>
+          </div>
+
+          <p style="color: #666; font-size: 14px;">
+            Des questions sur votre livraison ? Contactez-nous par WhatsApp au <strong>+33 6 89 66 91 15</strong>
+            ou par email à <a href="mailto:casastephiberico@gmail.com" style="color: #C9A66B;">casastephiberico@gmail.com</a>.
+          </p>
+
+          <p style="margin-top: 30px; color: #444; font-size: 14px;">
+            À très bientôt,<br>
+            <strong>L'équipe Casa Steph Iberico</strong>
+          </p>
+        </div>
+
+        <div style="background-color: #f5f5f5; padding: 20px 30px; text-align: center;">
+          <p style="margin: 0; font-size: 12px; color: #999;">
+            Casa Steph Iberico, Metz, France<br>
+            <a href="mailto:casastephiberico@gmail.com" style="color: #C9A66B; text-decoration: none;">casastephiberico@gmail.com</a>
+          </p>
+        </div>
+
       </div>
     `,
     };
 
     try {
         await transporter.sendMail(mailOptions);
-        console.log(`✅ Email sent to ${user.email}`);
+        console.log(`✅ In-delivery email sent to ${user.email}`);
         return { success: true };
     } catch (error) {
-        console.error('❌ Email sending failed:', error);
+        console.error('❌ In-delivery email failed:', error);
         return { success: false, error };
     }
 };
 
 const sendOrderDeliveredEmail = async (order, user) => {
+    const orderNumber = `AE-${order.id.toString().padStart(6, '0')}`;
+    const frontendUrl = process.env.FRONTEND_URL || 'https://casa-steph-iberico.vercel.app';
+    const invoiceUrl = `${frontendUrl}/account/orders/${order.id}`;
+
     const mailOptions = {
         from: process.env.SMTP_FROM || '"Casa Steph Iberico" <casastephmetz@gmail.com>',
         to: user.email,
-        subject: `Commande #${order.id} livrée - Merci! 🎉`,
+        subject: `Commande livrée — Merci pour votre confiance !`,
         html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #C9A66B;">Merci pour votre commande!</h2>
-        
-        <p>Bonjour ${user.firstName},</p>
-        
-        <p>Votre commande #${order.id} a été livrée avec succès.</p>
-        
-        <p>Nous espérons que vous apprécierez nos produits!</p>
-        
-        <p style="margin-top: 30px;">À très bientôt,<br><strong>Casa Steph Iberico</strong></p>
-        
-        <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
-        
-        <p style="font-size: 12px; color: #666;">
-          N'hésitez pas à nous laisser un avis ou à nous contacter pour toute question.
-        </p>
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+
+        <div style="background-color: #1a1714; padding: 32px 30px; text-align: center;">
+          <h1 style="color: #C9A66B; margin: 0; font-size: 26px; letter-spacing: 1px;">Casa Steph Iberico</h1>
+          <p style="color: #888; margin: 6px 0 0 0; font-size: 13px;">Charcuterie & fromages ibériques · Metz</p>
+        </div>
+
+        <div style="padding: 40px 30px;">
+
+          <h2 style="color: #1a1714; margin-top: 0;">
+            Commande livrée — merci ${user.firstName ? user.firstName : ''} !
+          </h2>
+
+          <p style="color: #444; font-size: 15px; line-height: 1.6;">
+            Votre commande <strong>${orderNumber}</strong> a bien été livrée.
+            Nous espérons que vous régalez avec nos produits ibériques !
+          </p>
+
+          <div style="background-color: #f9f6f2; border-left: 4px solid #C9A66B; padding: 18px 20px; margin: 25px 0; border-radius: 0 8px 8px 0;">
+            <p style="margin: 0; font-size: 14px; color: #444; line-height: 1.7;">
+              Si quelque chose ne correspond pas à vos attentes, ou si vous avez la moindre question
+              sur votre commande, n'hésitez pas à nous contacter directement — nous sommes là pour vous.
+            </p>
+          </div>
+
+          <div style="text-align: center; margin: 40px 0 30px 0;">
+            <a href="${invoiceUrl}"
+               style="background-color: #C9A66B; color: #1a1714; padding: 16px 44px; border-radius: 4px; text-decoration: none; font-weight: bold; font-size: 16px; display: inline-block;">
+              Télécharger ma facture
+            </a>
+          </div>
+
+          <p style="color: #666; font-size: 14px; text-align: center;">
+            Par WhatsApp : <strong>+33 6 89 66 91 15</strong><br>
+            Par email : <a href="mailto:casastephiberico@gmail.com" style="color: #C9A66B;">casastephiberico@gmail.com</a>
+          </p>
+
+          <p style="margin-top: 35px; color: #444; font-size: 15px; line-height: 1.6;">
+            Nous espérons vous retrouver très bientôt chez Casa Steph Iberico.<br><br>
+            <strong>L'équipe Casa Steph Iberico</strong>
+          </p>
+        </div>
+
+        <div style="background-color: #f5f5f5; padding: 20px 30px; text-align: center;">
+          <p style="margin: 0; font-size: 12px; color: #999;">
+            Casa Steph Iberico, Metz, France<br>
+            <a href="mailto:casastephiberico@gmail.com" style="color: #C9A66B; text-decoration: none;">casastephiberico@gmail.com</a>
+          </p>
+        </div>
+
       </div>
     `,
     };
 
     try {
         await transporter.sendMail(mailOptions);
-        console.log(`✅ Delivery confirmation sent to ${user.email}`);
+        console.log(`✅ Delivered email sent to ${user.email}`);
         return { success: true };
     } catch (error) {
-        console.error('❌ Email sending failed:', error);
+        console.error('❌ Delivered email failed:', error);
         return { success: false, error };
     }
 };
@@ -147,7 +246,7 @@ const sendOrderConfirmationEmail = async (order, user) => {
     const orderNumber = `AE-${order.id.toString().padStart(6, '0')}`;
     const paymentLabel = order.paymentMethod === 'cash'
         ? 'Espèces à la livraison'
-        : 'Lien de paiement (envoyé par Stéphane)';
+        : 'Lien de paiement sécurisé';
 
     const mailOptions = {
         from: process.env.SMTP_FROM || '"Casa Steph Iberico" <casastephmetz@gmail.com>',
@@ -411,11 +510,128 @@ const sendPaymentLinkEmail = async (order, user, sumupLink) => {
     }
 };
 
+const sendPaymentConfirmedEmail = async (order, user) => {
+    const orderNumber = `AE-${order.id.toString().padStart(6, '0')}`;
+    const frontendUrl = process.env.FRONTEND_URL || 'https://casa-steph-iberico.vercel.app';
+    const invoiceUrl = `${frontendUrl}/account/orders/${order.id}`;
+
+    let items = [];
+    try {
+        items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
+        if (typeof items === 'string') items = JSON.parse(items);
+    } catch (_) { items = []; }
+
+    const itemsHtml = items.length > 0 ? items.map(item => `
+        <tr>
+          <td style="padding: 9px 0; border-bottom: 1px solid #eee; color: #333;">${item.name}</td>
+          <td style="padding: 9px 0; border-bottom: 1px solid #eee; text-align: center; color: #666;">×${item.quantity}</td>
+          <td style="padding: 9px 0; border-bottom: 1px solid #eee; text-align: right; font-weight: 600; color: #1a1714;">${(item.price * item.quantity).toFixed(2)} €</td>
+        </tr>
+    `).join('') : `<tr><td colspan="3" style="padding: 10px 0; color: #999; font-style: italic;">Détail non disponible</td></tr>`;
+
+    const deliveryRow = order.deliveryFee > 0
+        ? `<tr><td style="padding: 4px 0; color: #666;">Livraison</td><td style="text-align: right; color: #666;">${Number(order.deliveryFee).toFixed(2)} €</td></tr>`
+        : `<tr><td style="padding: 4px 0; color: #666;">Livraison</td><td style="text-align: right; color: #2e7d32; font-weight: 600;">Gratuite</td></tr>`;
+
+    const mailOptions = {
+        from: process.env.SMTP_FROM || '"Casa Steph Iberico" <casastephmetz@gmail.com>',
+        to: user.email,
+        subject: `Paiement confirmé — ${orderNumber} ✓`,
+        html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+
+        <div style="background-color: #1a1714; padding: 32px 30px; text-align: center;">
+          <h1 style="color: #C9A66B; margin: 0; font-size: 26px; letter-spacing: 1px;">Casa Steph Iberico</h1>
+          <p style="color: #888; margin: 6px 0 0 0; font-size: 13px;">Charcuterie & fromages ibériques · Metz</p>
+        </div>
+
+        <div style="padding: 40px 30px;">
+
+          <h2 style="color: #1a1714; margin-top: 0;">
+            Paiement confirmé, merci ${user.firstName ? user.firstName : ''}&nbsp;!
+          </h2>
+
+          <p style="color: #444; font-size: 15px; line-height: 1.6;">
+            Nous avons bien reçu votre paiement pour la commande <strong>${orderNumber}</strong>.
+            Votre commande est maintenant en cours de préparation.
+          </p>
+
+          <div style="background-color: #f9f6f2; border-left: 4px solid #C9A66B; padding: 18px 20px; margin: 25px 0; border-radius: 0 8px 8px 0;">
+            <p style="margin: 0 0 5px 0; font-size: 14px;"><strong>📋 Référence :</strong> ${orderNumber}</p>
+            <p style="margin: 0; font-size: 14px;"><strong>💰 Montant réglé :</strong> <span style="color: #C9A66B; font-size: 16px; font-weight: bold;">${order.total.toFixed(2)} €</span></p>
+          </div>
+
+          <h3 style="color: #1a1714; border-bottom: 2px solid #C9A66B; padding-bottom: 8px; font-size: 15px;">Récapitulatif de votre commande</h3>
+          <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+            <thead>
+              <tr style="color: #999; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">
+                <th style="text-align: left; padding-bottom: 8px;">Produit</th>
+                <th style="text-align: center; padding-bottom: 8px;">Qté</th>
+                <th style="text-align: right; padding-bottom: 8px;">Prix</th>
+              </tr>
+            </thead>
+            <tbody>${itemsHtml}</tbody>
+          </table>
+          <table style="width: 100%; margin-top: 10px; font-size: 14px;">
+            ${deliveryRow}
+            <tr>
+              <td style="padding: 10px 0 0 0; font-size: 17px; font-weight: bold; color: #1a1714;">Total payé</td>
+              <td style="text-align: right; padding-top: 10px; font-size: 17px; font-weight: bold; color: #C9A66B;">${order.total.toFixed(2)} €</td>
+            </tr>
+          </table>
+
+          <div style="text-align: center; margin: 40px 0 30px 0;">
+            <a href="${invoiceUrl}"
+               style="background-color: #C9A66B; color: #1a1714; padding: 16px 44px; border-radius: 4px; text-decoration: none; font-weight: bold; font-size: 16px; display: inline-block;">
+              Télécharger ma facture
+            </a>
+          </div>
+
+          <div style="background-color: #f0f7f0; border-left: 4px solid #4caf50; padding: 18px 20px; border-radius: 0 8px 8px 0; margin-bottom: 30px;">
+            <p style="margin: 0 0 8px 0; font-weight: bold; color: #2e7d32; font-size: 14px;">Prochaines étapes</p>
+            <p style="margin: 0; color: #444; font-size: 14px; line-height: 1.7;">
+              Nous préparons votre commande avec soin. Vous recevrez un email dès qu'elle sera <strong>prête pour la livraison</strong>.
+            </p>
+          </div>
+
+          <p style="color: #666; font-size: 14px;">
+            Des questions ? Contactez-nous par WhatsApp au <strong>+33 6 89 66 91 15</strong> ou par email à
+            <a href="mailto:casastephiberico@gmail.com" style="color: #C9A66B;">casastephiberico@gmail.com</a>.
+          </p>
+
+          <p style="margin-top: 30px; color: #444; font-size: 14px;">
+            À très bientôt,<br>
+            <strong>L'équipe Casa Steph Iberico</strong>
+          </p>
+        </div>
+
+        <div style="background-color: #f5f5f5; padding: 20px 30px; text-align: center;">
+          <p style="margin: 0; font-size: 12px; color: #999;">
+            Casa Steph Iberico, Metz, France<br>
+            <a href="mailto:casastephiberico@gmail.com" style="color: #C9A66B; text-decoration: none;">casastephiberico@gmail.com</a>
+          </p>
+        </div>
+
+      </div>
+    `,
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log(`✅ Payment confirmed email sent to ${user.email}`);
+        return { success: true };
+    } catch (error) {
+        console.error('❌ Payment confirmed email failed:', error);
+        return { success: false, error };
+    }
+};
+
 module.exports = {
-    sendOrderReadyEmail,
+    sendOrderInDeliveryEmail,
     sendOrderDeliveredEmail,
     sendPasswordResetEmail,
     sendWelcomeEmail,
     sendOrderConfirmationEmail,
     sendPaymentLinkEmail,
+    sendPaymentConfirmedEmail,
 };

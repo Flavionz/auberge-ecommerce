@@ -46,7 +46,7 @@ const getStatusBadge = (status: string) => {
         case 'en_preparation':
             return { bg: 'bg-blue-900/20', border: 'border-blue-500', text: 'text-blue-300', label: 'En préparation', icon: Package };
         case 'pret_pour_livraison':
-            return { bg: 'bg-green-900/20', border: 'border-green-500', text: 'text-green-300', label: 'Prêt pour livraison', icon: Truck };
+            return { bg: 'bg-green-900/20', border: 'border-green-500', text: 'text-green-300', label: 'En livraison', icon: Truck };
         case 'livre':
             return { bg: 'bg-gray-900/20', border: 'border-gray-500', text: 'text-gray-300', label: 'Livré', icon: CheckCircle };
         case 'annule':
@@ -109,7 +109,7 @@ export const OrderDetailPage = () => {
     const statusBadge = getStatusBadge(order.status);
     const StatusIcon = statusBadge.icon;
     const items = parseItems(order.items);
-    const canDownloadInvoice = order.invoiceNumber && (order.paymentStatus === 'paid' || order.status === 'delivered');
+    const canDownloadInvoice = order.invoiceNumber != null && ['paye', 'en_preparation', 'pret_pour_livraison', 'livre'].includes(order.status);
 
     const handleDownloadInvoice = () => {
         const token = localStorage.getItem('authToken');
@@ -169,7 +169,7 @@ export const OrderDetailPage = () => {
                     {order.paymentMethod && (
                         <div>
                             <p className="text-xs uppercase tracking-wider text-gray-500 mb-1">Paiement</p>
-                            <p className="text-white capitalize">{order.paymentMethod === 'cash' ? 'Espèces à la livraison' : 'Lien de paiement (envoyé par Stéphane)'}</p>
+                            <p className="text-white capitalize">{order.paymentMethod === 'cash' ? 'Espèces à la livraison' : 'Lien de paiement sécurisé'}</p>
                         </div>
                     )}
                 </div>

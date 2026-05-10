@@ -1,5 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
-const { sendOrderConfirmationEmail } = require('../services/emailService');
+const { sendOrderConfirmationEmail, sendPaymentConfirmedEmail, sendOrderDeliveredEmail } = require('../services/emailService');
 const { generateInvoicePDF, generateInvoiceNumber } = require('../services/invoiceService');
 
 const prisma = new PrismaClient();
@@ -38,7 +38,10 @@ const createOrder = async (req, res) => {
         const parsedItems = typeof items === 'string' ? JSON.parse(items) : items;
         const productIds = parsedItems.map(item => item.id).filter(Boolean);
         const dbProducts = productIds.length > 0
-            ? await prisma.product.findMany({ where: { id: { in: productIds } } })
+            ? await prisma.product.findMany({
+                where: { id: { in: productIds } },
+                include: { category: true },
+            })
             : [];
 
         let cartTotal;
@@ -80,8 +83,17 @@ const createOrder = async (req, res) => {
 
         const deliveryFee = calcDeliveryFee(postalCode, cartTotal);
         const orderTotal  = cartTotal + deliveryFee;
-        // items arrives already stringified from the client
-        const itemsString = typeof items === 'string' ? items : JSON.stringify(items);
+
+        // Enrich items with tvaRate from product category (for invoice generation)
+        const enrichedItems = parsedItems.map(item => {
+            const product = dbProducts.find(p => p.id === item.id);
+            return {
+                ...item,
+                price: product ? product.price : item.price,
+                tvaRate: product?.category?.tvaRate ?? 5.5,
+            };
+        });
+        const itemsString = JSON.stringify(enrichedItems);
 
         const order = await prisma.order.create({
             data: {
@@ -179,10 +191,24 @@ const updateOrderStatus = async (req, res) => {
             return res.status(400).json({ error: 'Statut invalide' });
         }
 
+        const updateData = { status };
+        if (status === 'paye') updateData.paymentStatus = 'paid';
+
         const order = await prisma.order.update({
             where: { id: parseInt(id) },
-            data: { status }
+            data: updateData,
         });
+
+        if (status === 'paye' || status === 'livre') {
+            const user = await prisma.user.findUnique({
+                where: { id: order.userId },
+                select: { email: true, firstName: true, lastName: true },
+            });
+            if (user) {
+                if (status === 'paye') sendPaymentConfirmedEmail(order, user).catch(err => console.error('Payment confirmed email error:', err));
+                if (status === 'livre') sendOrderDeliveredEmail(order, user).catch(err => console.error('Delivered email error:', err));
+            }
+        }
 
         res.json({ message: 'Statut de la commande mis à jour', order });
     } catch (error) {

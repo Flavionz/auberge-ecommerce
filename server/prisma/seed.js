@@ -9,20 +9,20 @@ async function main() {
     // ── Catégories ─────────────────────────────────────────────────────────────
     const catCharcuterie = await prisma.category.upsert({
         where: { name: 'Charcuterie & Fromages' },
-        update: {},
-        create: { name: 'Charcuterie & Fromages' },
+        update: { tvaRate: 5.5 },
+        create: { name: 'Charcuterie & Fromages', tvaRate: 5.5 },
     });
 
     const catBoissons = await prisma.category.upsert({
         where: { name: 'Boissons & Vins' },
-        update: {},
-        create: { name: 'Boissons & Vins' },
+        update: { tvaRate: 20 },
+        create: { name: 'Boissons & Vins', tvaRate: 20 },
     });
 
     const catConserves = await prisma.category.upsert({
         where: { name: 'Épicerie & Conserves' },
-        update: {},
-        create: { name: 'Épicerie & Conserves' },
+        update: { tvaRate: 5.5 },
+        create: { name: 'Épicerie & Conserves', tvaRate: 5.5 },
     });
 
     console.log('✅ Catégories créées.');

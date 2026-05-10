@@ -47,7 +47,7 @@ export const UserOrders = () => {
             case 'en_preparation':
                 return { bg: 'bg-blue-900/20', border: 'border-blue-500', text: 'text-blue-300', label: 'En préparation', icon: Package };
             case 'pret_pour_livraison':
-                return { bg: 'bg-green-900/20', border: 'border-green-500', text: 'text-green-300', label: 'Prêt pour livraison', icon: Truck };
+                return { bg: 'bg-green-900/20', border: 'border-green-500', text: 'text-green-300', label: 'En livraison', icon: Truck };
             case 'livre':
                 return { bg: 'bg-gray-900/20', border: 'border-gray-500', text: 'text-gray-300', label: 'Livré', icon: CheckCircle };
             case 'annule':
