@@ -1,5 +1,7 @@
 const nodemailer = require('nodemailer');
 
+const escapeHtml = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
 const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
     port: process.env.SMTP_PORT || 587,
@@ -716,7 +718,7 @@ const sendAdminNewOrderEmail = async (order, customer) => {
 
     const itemsHtml = items.map(item => `
         <tr>
-          <td style="padding: 8px 0; border-bottom: 1px solid #eee; color: #333;">${item.name}</td>
+          <td style="padding: 8px 0; border-bottom: 1px solid #eee; color: #333;">${escapeHtml(item.name)}</td>
           <td style="padding: 8px 0; border-bottom: 1px solid #eee; text-align: center; color: #666;">×${item.quantity}</td>
           <td style="padding: 8px 0; border-bottom: 1px solid #eee; text-align: right; font-weight: 600;">${(item.price * item.quantity).toFixed(2)} €</td>
         </tr>
@@ -745,10 +747,10 @@ const sendAdminNewOrderEmail = async (order, customer) => {
 
           <h3 style="color: #333; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">Client</h3>
           <table style="width: 100%; margin-bottom: 24px;">
-            <tr><td style="padding: 4px 0; color: #666; font-size: 14px; width: 140px;">Nom</td><td style="font-size: 14px; color: #333;">${customer.firstName || ''} ${customer.lastName || ''}</td></tr>
-            <tr><td style="padding: 4px 0; color: #666; font-size: 14px;">Email</td><td style="font-size: 14px; color: #333;">${customer.email}</td></tr>
-            <tr><td style="padding: 4px 0; color: #666; font-size: 14px;">Téléphone</td><td style="font-size: 14px; color: #333;">${order.phone}</td></tr>
-            <tr><td style="padding: 4px 0; color: #666; font-size: 14px;">Adresse</td><td style="font-size: 14px; color: #333;">${order.deliveryAddress}, ${order.postalCode}</td></tr>
+            <tr><td style="padding: 4px 0; color: #666; font-size: 14px; width: 140px;">Nom</td><td style="font-size: 14px; color: #333;">${escapeHtml(customer.firstName)} ${escapeHtml(customer.lastName)}</td></tr>
+            <tr><td style="padding: 4px 0; color: #666; font-size: 14px;">Email</td><td style="font-size: 14px; color: #333;">${escapeHtml(customer.email)}</td></tr>
+            <tr><td style="padding: 4px 0; color: #666; font-size: 14px;">Téléphone</td><td style="font-size: 14px; color: #333;">${escapeHtml(order.phone)}</td></tr>
+            <tr><td style="padding: 4px 0; color: #666; font-size: 14px;">Adresse</td><td style="font-size: 14px; color: #333;">${escapeHtml(order.deliveryAddress)}, ${escapeHtml(order.postalCode)}</td></tr>
             <tr><td style="padding: 4px 0; color: #666; font-size: 14px;">Contact préféré</td><td style="font-size: 14px; color: #333; font-weight: bold;">${contactLabel}</td></tr>
           </table>
 
@@ -761,7 +763,7 @@ const sendAdminNewOrderEmail = async (order, customer) => {
             </tr>
           </table>
 
-          ${order.notes ? `<div style="background-color: #f9f9f9; padding: 12px 16px; border-radius: 6px; margin-bottom: 24px;"><p style="margin: 0; font-size: 13px; color: #666;">Note : ${order.notes}</p></div>` : ''}
+          ${order.notes ? `<div style="background-color: #f9f9f9; padding: 12px 16px; border-radius: 6px; margin-bottom: 24px;"><p style="margin: 0; font-size: 13px; color: #666;">Note : ${escapeHtml(order.notes)}</p></div>` : ''}
 
           <div style="text-align: center; margin-top: 28px;">
             <a href="${adminOrdersUrl}" style="display: inline-block; background-color: #C9A66B; color: #1a1714; padding: 13px 30px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 14px; letter-spacing: 0.5px;">

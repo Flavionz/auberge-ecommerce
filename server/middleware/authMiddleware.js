@@ -1,7 +1,10 @@
 const jwt = require('jsonwebtoken');
+const { PrismaClient } = require('@prisma/client');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) throw new Error('FATAL: JWT_SECRET environment variable is not set.');
+
+const prisma = new PrismaClient();
 
 const authenticate = async (req, res, next) => {
     try {
@@ -12,8 +15,19 @@ const authenticate = async (req, res, next) => {
         }
 
         const decoded = jwt.verify(token, JWT_SECRET);
-        req.user = decoded;
 
+        // Invalidate tokens issued before a password change
+        if (decoded.userId) {
+            const user = await prisma.user.findUnique({
+                where: { id: decoded.userId },
+                select: { passwordChangedAt: true }
+            });
+            if (user?.passwordChangedAt && decoded.iat * 1000 < user.passwordChangedAt.getTime()) {
+                return res.status(401).json({ error: 'Session expirée, veuillez vous reconnecter' });
+            }
+        }
+
+        req.user = decoded;
         next();
     } catch (error) {
         return res.status(401).json({ error: 'Token invalide ou expiré' });

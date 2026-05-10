@@ -81,17 +81,21 @@ const updatePassword = async (req, res) => {
             return res.status(404).json({ error: 'Utilisateur non trouvé' });
         }
 
+        if (!newPassword || newPassword.length < 8) {
+            return res.status(400).json({ error: 'Le nouveau mot de passe doit contenir au moins 8 caractères' });
+        }
+
         const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
 
         if (!isPasswordValid) {
             return res.status(401).json({ error: 'Mot de passe actuel incorrect' });
         }
 
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        const hashedPassword = await bcrypt.hash(newPassword, 12);
 
         await prisma.user.update({
             where: { id: req.user.userId },
-            data: { password: hashedPassword }
+            data: { password: hashedPassword, passwordChangedAt: new Date() }
         });
 
         res.json({ message: 'Mot de passe modifié avec succès' });

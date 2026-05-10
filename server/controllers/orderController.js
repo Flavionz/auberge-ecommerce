@@ -1,5 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
-const { sendOrderConfirmationEmail, sendPaymentConfirmedEmail, sendOrderDeliveredEmail, sendAdminNewOrderEmail } = require('../services/emailService');
+const { sendOrderConfirmationEmail, sendPaymentConfirmedEmail, sendOrderDeliveredEmail, sendAdminNewOrderEmail, sendOrderInDeliveryEmail, sendPaymentLinkEmail } = require('../services/emailService');
 const { generateInvoicePDF, generateInvoiceNumber } = require('../services/invoiceService');
 
 const prisma = new PrismaClient();
@@ -168,10 +168,14 @@ const getUserOrders = async (req, res) => {
 
 const getAllOrders = async (req, res) => {
     try {
+        const { status } = req.query;
+        const where = status && status !== 'all' ? { status } : {};
+
         const orders = await prisma.order.findMany({
+            where,
             include: {
                 user: {
-                    select: { email: true, firstName: true, lastName: true }
+                    select: { id: true, email: true, firstName: true, lastName: true, phone: true }
                 }
             },
             orderBy: { createdAt: 'desc' }
@@ -247,6 +251,122 @@ const downloadInvoice = async (req, res) => {
     }
 };
 
+const getOrderById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const order = await prisma.order.findUnique({
+            where: { id: parseInt(id) },
+            include: {
+                user: {
+                    select: { id: true, email: true, firstName: true, lastName: true, phone: true, address: true, city: true, postalCode: true }
+                }
+            }
+        });
+        if (!order) return res.status(404).json({ error: 'Commande non trouvée' });
+        res.json(order);
+    } catch (error) {
+        console.error('Get order by id error:', error);
+        res.status(500).json({ error: 'Erreur lors de la récupération' });
+    }
+};
+
+const setDeliverySlot = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { deliveryTimeSlot, deliveryDate } = req.body;
+        if (!deliveryTimeSlot || !deliveryDate) {
+            return res.status(400).json({ error: 'Créneau et date requis' });
+        }
+        const order = await prisma.order.update({
+            where: { id: parseInt(id) },
+            data: { deliveryTimeSlot, deliveryDate, status: 'pret_pour_livraison', updatedAt: new Date() },
+            include: { user: true }
+        });
+        if (order.user) {
+            sendOrderInDeliveryEmail(order, order.user).catch(err => console.error('In-delivery email error:', err));
+        }
+        res.json({ ...order, message: 'Créneau de livraison défini' });
+    } catch (error) {
+        console.error('Set delivery slot error:', error);
+        res.status(500).json({ error: 'Erreur lors de la définition du créneau' });
+    }
+};
+
+const ALLOWED_SUMUP_DOMAINS = ['pay.sumup.com', 'api.sumup.com', 'sumup.com'];
+
+const sendPaymentLink = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { sumupLink } = req.body;
+
+        let parsedUrl;
+        try {
+            parsedUrl = new URL(sumupLink);
+        } catch {
+            return res.status(400).json({ error: 'Lien de paiement invalide' });
+        }
+        if (!ALLOWED_SUMUP_DOMAINS.includes(parsedUrl.hostname)) {
+            return res.status(400).json({ error: 'Lien de paiement invalide' });
+        }
+
+        const order = await prisma.order.findUnique({
+            where: { id: parseInt(id) },
+            include: { user: true }
+        });
+        if (!order) return res.status(404).json({ error: 'Commande non trouvée' });
+
+        const updatedOrder = await prisma.order.update({
+            where: { id: parseInt(id) },
+            data: { sumupLink, sumupLinkSentAt: new Date(), status: 'lien_envoye', updatedAt: new Date() }
+        });
+
+        if (order.contactPreference === 'email' && order.user) {
+            await sendPaymentLinkEmail(order, order.user, sumupLink);
+        }
+
+        res.json({
+            message: order.contactPreference === 'email'
+                ? 'Lien enregistré et email envoyé au client'
+                : 'Lien enregistré — envoyez-le manuellement au client',
+            order: updatedOrder,
+            contactPreference: order.contactPreference,
+        });
+    } catch (error) {
+        console.error('Send payment link error:', error);
+        res.status(500).json({ error: 'Erreur lors de l\'envoi du lien' });
+    }
+};
+
+const sendNotification = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { type } = req.body;
+        const order = await prisma.order.findUnique({
+            where: { id: parseInt(id) },
+            include: { user: true }
+        });
+        if (!order) return res.status(404).json({ error: 'Commande non trouvée' });
+
+        let result;
+        if (type === 'ready') {
+            result = await sendOrderInDeliveryEmail(order, order.user);
+        } else if (type === 'delivered') {
+            result = await sendOrderDeliveredEmail(order, order.user);
+        } else {
+            return res.status(400).json({ error: 'Type de notification invalide' });
+        }
+
+        if (result?.success) {
+            res.json({ message: 'Email envoyé avec succès' });
+        } else {
+            res.status(500).json({ error: 'Erreur lors de l\'envoi de l\'email' });
+        }
+    } catch (error) {
+        console.error('Send notification error:', error);
+        res.status(500).json({ error: 'Erreur lors de l\'envoi' });
+    }
+};
+
 const getAdminNotifications = async (req, res) => {
     try {
         const unseen = await prisma.order.findMany({
@@ -284,5 +404,9 @@ module.exports = {
     updateOrderStatus,
     downloadInvoice,
     getAdminNotifications,
-    markNotificationsSeen
+    markNotificationsSeen,
+    getOrderById,
+    setDeliverySlot,
+    sendPaymentLink,
+    sendNotification
 };

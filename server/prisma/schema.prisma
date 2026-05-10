@@ -26,6 +26,7 @@ model User {
   resetTokenUsed         Boolean  @default(false)
   isEmailVerified        Boolean  @default(false)
   emailVerificationToken String?  @unique
+  passwordChangedAt      DateTime?
   createdAt              DateTime @default(now())
   orders         Order[]
 }

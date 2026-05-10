@@ -33,7 +33,7 @@ const register = async (req, res) => {
             return res.status(400).json({ error: 'Cet email est déjà utilisé' });
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(password, 12);
 
         const user = await prisma.user.create({
             data: {
@@ -230,7 +230,7 @@ const resetPassword = async (req, res) => {
         const hashedPassword = await bcrypt.hash(newPassword, 10);
         await prisma.user.update({
             where: { id: decoded.userId },
-            data: { password: hashedPassword, resetToken: null, resetTokenUsed: true },
+            data: { password: hashedPassword, resetToken: null, resetTokenUsed: true, passwordChangedAt: new Date() },
         });
 
         res.json({ message: 'Mot de passe réinitialisé avec succès' });

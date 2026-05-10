@@ -45,7 +45,8 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
     const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
     if (!endpointSecret) {
-        return res.json({ received: true });
+        console.error('STRIPE_WEBHOOK_SECRET not configured — rejecting webhook');
+        return res.status(500).json({ error: 'Webhook not configured' });
     }
 
     let event;
