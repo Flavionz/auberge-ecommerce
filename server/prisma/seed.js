@@ -208,7 +208,7 @@ async function main() {
     const tables = ['User', 'Category', 'Product', 'Order', 'FeaturedProduct'];
     for (const table of tables) {
         await prisma.$executeRawUnsafe(
-            `SELECT setval(pg_get_serial_sequence('"${table}"', 'id'), COALESCE(MAX(id), 0)) FROM "${table}"`
+            `SELECT setval(pg_get_serial_sequence('"${table}"', 'id'), COALESCE(MAX(id), 1)) FROM "${table}"`
         );
     }
     console.log('✅ Séquences réinitialisées.');

@@ -1,10 +1,5 @@
 import { LegalLayout } from './LegalLayout';
 
-const Placeholder = ({ label }: { label: string }) => (
-    <span className="bg-yellow-500/20 text-yellow-300 border border-yellow-500/40 rounded px-1.5 py-0.5 text-xs font-mono">
-        [{label}]
-    </span>
-);
 
 export const MentionsLegalesPage = () => {
     const sections = [
@@ -21,7 +16,8 @@ export const MentionsLegalesPage = () => {
                         <li><span className="text-gray-400">SIREN :</span> 519 942 924</li>
                         <li><span className="text-gray-400">N° RCS :</span> 519 942 924 R.C.S. Metz</li>
                         <li><span className="text-gray-400">TVA :</span> TVA non applicable — art. 293 B du CGI</li>
-                        <li><span className="text-gray-400">Email :</span> casastephiberico@gmail.com</li>
+                        <li><span className="text-gray-400">Site web :</span> <a href="https://casasteph.fr" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">casasteph.fr</a></li>
+                        <li><span className="text-gray-400">Email :</span> casastephmetz@gmail.com</li>
                         <li><span className="text-gray-400">Téléphone :</span> +33 6 89 66 91 15</li>
                         <li><span className="text-gray-400">Directeur de publication :</span> MILHAU Stéphane</li>
                     </ul>
@@ -32,11 +28,24 @@ export const MentionsLegalesPage = () => {
             title: 'Hébergement',
             content: (
                 <>
-                    <p>Ce site est hébergé par :</p>
-                    <ul className="mt-2 space-y-1 list-none">
-                        <li><span className="text-gray-400">Hébergeur :</span> <Placeholder label="NOM DE L'HÉBERGEUR (ex: OVH, Vercel, etc.)" /></li>
-                        <li><span className="text-gray-400">Adresse :</span> <Placeholder label="ADRESSE DE L'HÉBERGEUR" /></li>
-                        <li><span className="text-gray-400">Site web :</span> <Placeholder label="https://www.hebergeur.fr" /></li>
+                    <p>Ce site est hébergé par les prestataires suivants :</p>
+                    <p className="mt-4 text-gray-400 text-sm uppercase tracking-wider">Interface (frontend)</p>
+                    <ul className="mt-1 space-y-1 list-none">
+                        <li><span className="text-gray-400">Hébergeur :</span> Vercel Inc.</li>
+                        <li><span className="text-gray-400">Adresse :</span> 340 S Lemon Ave #4133, Walnut, CA 91789, États-Unis</li>
+                        <li><span className="text-gray-400">Site web :</span> <a href="https://vercel.com" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">https://vercel.com</a></li>
+                    </ul>
+                    <p className="mt-4 text-gray-400 text-sm uppercase tracking-wider">Serveur applicatif (backend)</p>
+                    <ul className="mt-1 space-y-1 list-none">
+                        <li><span className="text-gray-400">Hébergeur :</span> Render Services, Inc.</li>
+                        <li><span className="text-gray-400">Adresse :</span> 525 Brannan St, Suite 300, San Francisco, CA 94107, États-Unis</li>
+                        <li><span className="text-gray-400">Site web :</span> <a href="https://render.com" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">https://render.com</a></li>
+                    </ul>
+                    <p className="mt-4 text-gray-400 text-sm uppercase tracking-wider">Nom de domaine</p>
+                    <ul className="mt-1 space-y-1 list-none">
+                        <li><span className="text-gray-400">Registrar :</span> OVH SAS</li>
+                        <li><span className="text-gray-400">Adresse :</span> 2 rue Kellermann, 59100 Roubaix, France</li>
+                        <li><span className="text-gray-400">Site web :</span> <a href="https://www.ovhcloud.com" target="_blank" rel="noopener noreferrer" className="text-gold hover:underline">https://www.ovhcloud.com</a></li>
                     </ul>
                 </>
             ),
