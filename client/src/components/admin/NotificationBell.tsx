@@ -74,7 +74,7 @@ export const NotificationBell: React.FC = () => {
         }
     };
 
-    const handleOrderClick = (orderId: number) => {
+    const handleOrderClick = () => {
         setOpen(false);
         navigate('/admin/orders');
     };
@@ -114,7 +114,7 @@ export const NotificationBell: React.FC = () => {
                                 return (
                                     <li key={order.id}>
                                         <button
-                                            onClick={() => handleOrderClick(order.id)}
+                                            onClick={handleOrderClick}
                                             className="w-full px-4 py-3 text-left hover:bg-amber-50 transition-colors"
                                         >
                                             <div className="flex items-center justify-between mb-1">
