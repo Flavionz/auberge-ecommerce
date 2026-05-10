@@ -102,7 +102,7 @@ export const CheckoutPage = () => {
             navigate('/order-confirmation', {
                 state: {
                     orderData: {
-                        orderId: response.data.id,
+                        orderId: response.data.order.id,
                         total: orderTotal,
                         items: cartItems.map(item => ({
                             id: item.id,

@@ -53,7 +53,7 @@ export const OrderConfirmationPage = () => {
                             Merci pour votre commande
                         </p>
                         <p className="text-gold font-semibold text-2xl">
-                            N° {orderData.orderId}
+                            N° AE-{orderData.orderId.toString().padStart(6, '0')}
                         </p>
                     </div>
 
@@ -198,7 +198,7 @@ export const OrderConfirmationPage = () => {
                             Une question sur votre commande ?
                         </p>
                         <p className="text-gold font-medium">
-                            Contactez-nous : casastephiberico@gmail.com
+                            Contactez-nous : casastephmetz@gmail.com
                         </p>
                     </div>
                 </div>

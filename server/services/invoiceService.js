@@ -6,7 +6,7 @@ const SELLER = {
     address: '33 Rue des Chenevières',
     city: '57140 La Maxe',
     siren: '519 942 924',
-    email: 'casastephiberico@gmail.com',
+    email: 'casastephmetz@gmail.com',
     phone: '+33 6 89 66 91 15',
 };
 

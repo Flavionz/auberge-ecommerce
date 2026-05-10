@@ -95,7 +95,7 @@ const sendOrderInDeliveryEmail = async (order, user) => {
 
           <p style="color: #666; font-size: 14px;">
             Des questions sur votre livraison ? Contactez-nous par WhatsApp au <strong>+33 6 89 66 91 15</strong>
-            ou par email à <a href="mailto:casastephiberico@gmail.com" style="color: #C9A66B;">casastephiberico@gmail.com</a>.
+            ou par email à <a href="mailto:casastephmetz@gmail.com" style="color: #C9A66B;">casastephmetz@gmail.com</a>.
           </p>
 
           <p style="margin-top: 30px; color: #444; font-size: 14px;">
@@ -107,7 +107,7 @@ const sendOrderInDeliveryEmail = async (order, user) => {
         <div style="background-color: #f5f5f5; padding: 20px 30px; text-align: center;">
           <p style="margin: 0; font-size: 12px; color: #999;">
             Casa Steph Iberico, Metz, France<br>
-            <a href="mailto:casastephiberico@gmail.com" style="color: #C9A66B; text-decoration: none;">casastephiberico@gmail.com</a>
+            <a href="mailto:casastephmetz@gmail.com" style="color: #C9A66B; text-decoration: none;">casastephmetz@gmail.com</a>
           </p>
         </div>
 
@@ -169,7 +169,7 @@ const sendOrderDeliveredEmail = async (order, user) => {
 
           <p style="color: #666; font-size: 14px; text-align: center;">
             Par WhatsApp : <strong>+33 6 89 66 91 15</strong><br>
-            Par email : <a href="mailto:casastephiberico@gmail.com" style="color: #C9A66B;">casastephiberico@gmail.com</a>
+            Par email : <a href="mailto:casastephmetz@gmail.com" style="color: #C9A66B;">casastephmetz@gmail.com</a>
           </p>
 
           <p style="margin-top: 35px; color: #444; font-size: 15px; line-height: 1.6;">
@@ -181,7 +181,7 @@ const sendOrderDeliveredEmail = async (order, user) => {
         <div style="background-color: #f5f5f5; padding: 20px 30px; text-align: center;">
           <p style="margin: 0; font-size: 12px; color: #999;">
             Casa Steph Iberico, Metz, France<br>
-            <a href="mailto:casastephiberico@gmail.com" style="color: #C9A66B; text-decoration: none;">casastephiberico@gmail.com</a>
+            <a href="mailto:casastephmetz@gmail.com" style="color: #C9A66B; text-decoration: none;">casastephmetz@gmail.com</a>
           </p>
         </div>
 
@@ -218,7 +218,7 @@ const sendPasswordResetEmail = async (user, resetLink) => {
         </div>
         <p style="color: #888; font-size: 13px;">Si vous n'avez pas fait cette demande, ignorez cet email. Votre mot de passe ne sera pas modifié.</p>
         <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
-        <p style="font-size: 12px; color: #666;">Casa Steph Iberico · casastephiberico@gmail.com</p>
+        <p style="font-size: 12px; color: #666;">Casa Steph Iberico · casastephmetz@gmail.com</p>
       </div>
     `,
     };
@@ -300,7 +300,7 @@ const sendOrderConfirmationEmail = async (order, user) => {
           </table>
 
           <p style="margin-top: 30px; color: #666; font-size: 14px;">
-            Des questions ? Contactez-nous par WhatsApp au <strong>+33 6 89 66 91 15</strong> ou par email à <a href="mailto:casastephiberico@gmail.com" style="color: #C9A66B;">casastephiberico@gmail.com</a>.
+            Des questions ? Contactez-nous par WhatsApp au <strong>+33 6 89 66 91 15</strong> ou par email à <a href="mailto:casastephmetz@gmail.com" style="color: #C9A66B;">casastephmetz@gmail.com</a>.
           </p>
         </div>
 
@@ -354,7 +354,7 @@ const sendWelcomeEmail = async (user) => {
           </div>
 
           <p style="color: #666; font-size: 14px;">
-            Des questions ? Contactez-nous par WhatsApp au <strong>+33 6 89 66 91 15</strong> ou par email à <a href="mailto:casastephiberico@gmail.com" style="color: #C9A66B;">casastephiberico@gmail.com</a>.
+            Des questions ? Contactez-nous par WhatsApp au <strong>+33 6 89 66 91 15</strong> ou par email à <a href="mailto:casastephmetz@gmail.com" style="color: #C9A66B;">casastephmetz@gmail.com</a>.
           </p>
         </div>
 
@@ -479,7 +479,7 @@ const sendPaymentLinkEmail = async (order, user, sumupLink) => {
 
           <p style="color: #666; font-size: 14px;">
             Des questions ? Contactez-nous par WhatsApp au <strong>+33 6 89 66 91 15</strong> ou par email à
-            <a href="mailto:casastephiberico@gmail.com" style="color: #C9A66B;">casastephiberico@gmail.com</a>.
+            <a href="mailto:casastephmetz@gmail.com" style="color: #C9A66B;">casastephmetz@gmail.com</a>.
           </p>
 
           <p style="margin-top: 30px; color: #444; font-size: 14px;">
@@ -492,7 +492,7 @@ const sendPaymentLinkEmail = async (order, user, sumupLink) => {
         <div style="background-color: #f5f5f5; padding: 20px 30px; text-align: center;">
           <p style="margin: 0; font-size: 12px; color: #999;">
             Casa Steph Iberico, Metz, France<br>
-            <a href="mailto:casastephiberico@gmail.com" style="color: #C9A66B; text-decoration: none;">casastephiberico@gmail.com</a>
+            <a href="mailto:casastephmetz@gmail.com" style="color: #C9A66B; text-decoration: none;">casastephmetz@gmail.com</a>
           </p>
         </div>
 
@@ -554,7 +554,7 @@ const sendVerificationEmail = async (user, verificationLink) => {
 
           <p style="color: #666; font-size: 14px;">
             Des questions ? Contactez-nous à
-            <a href="mailto:casastephiberico@gmail.com" style="color: #C9A66B;">casastephiberico@gmail.com</a>.
+            <a href="mailto:casastephmetz@gmail.com" style="color: #C9A66B;">casastephmetz@gmail.com</a>.
           </p>
 
           <p style="margin-top: 30px; color: #444; font-size: 14px;">
@@ -566,7 +566,7 @@ const sendVerificationEmail = async (user, verificationLink) => {
         <div style="background-color: #f5f5f5; padding: 20px 30px; text-align: center;">
           <p style="margin: 0; font-size: 12px; color: #999;">
             Casa Steph Iberico, Metz, France<br>
-            <a href="mailto:casastephiberico@gmail.com" style="color: #C9A66B; text-decoration: none;">casastephiberico@gmail.com</a>
+            <a href="mailto:casastephmetz@gmail.com" style="color: #C9A66B; text-decoration: none;">casastephmetz@gmail.com</a>
           </p>
         </div>
 
@@ -670,7 +670,7 @@ const sendPaymentConfirmedEmail = async (order, user) => {
 
           <p style="color: #666; font-size: 14px;">
             Des questions ? Contactez-nous par WhatsApp au <strong>+33 6 89 66 91 15</strong> ou par email à
-            <a href="mailto:casastephiberico@gmail.com" style="color: #C9A66B;">casastephiberico@gmail.com</a>.
+            <a href="mailto:casastephmetz@gmail.com" style="color: #C9A66B;">casastephmetz@gmail.com</a>.
           </p>
 
           <p style="margin-top: 30px; color: #444; font-size: 14px;">
@@ -682,7 +682,7 @@ const sendPaymentConfirmedEmail = async (order, user) => {
         <div style="background-color: #f5f5f5; padding: 20px 30px; text-align: center;">
           <p style="margin: 0; font-size: 12px; color: #999;">
             Casa Steph Iberico, Metz, France<br>
-            <a href="mailto:casastephiberico@gmail.com" style="color: #C9A66B; text-decoration: none;">casastephiberico@gmail.com</a>
+            <a href="mailto:casastephmetz@gmail.com" style="color: #C9A66B; text-decoration: none;">casastephmetz@gmail.com</a>
           </p>
         </div>
 

@@ -19,7 +19,7 @@ export const ConfidentialitePage = () => {
                     <ul className="mt-2 space-y-1 list-none">
                         <li><span className="text-gray-400">Identité :</span> MILHAU Stéphane — Casa Steph Iberico</li>
                         <li><span className="text-gray-400">Adresse :</span> 33 Rue des Chenevières, 57140 La Maxe</li>
-                        <li><span className="text-gray-400">Email :</span> casastephiberico@gmail.com</li>
+                        <li><span className="text-gray-400">Email :</span> casastephmetz@gmail.com</li>
                         <li><span className="text-gray-400">Téléphone :</span> +33 6 89 66 91 15</li>
                     </ul>
                 </>
@@ -123,7 +123,7 @@ export const ConfidentialitePage = () => {
                         <li><strong>Droit à la limitation</strong> — limiter le traitement de vos données</li>
                     </ul>
                     <p className="mt-3">
-                        Pour exercer ces droits, contactez-nous à : <strong>casastephiberico@gmail.com</strong>
+                        Pour exercer ces droits, contactez-nous à : <strong>casastephmetz@gmail.com</strong>
                         {' '}en joignant une copie de votre pièce d'identité.
                         Nous nous engageons à répondre dans un délai de <strong>30 jours</strong>.
                     </p>

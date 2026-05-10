@@ -151,7 +151,7 @@ export const CGVPage = () => {
                     </p>
                     <p className="mt-2">
                         Pour exercer ce droit sur les produits éligibles, le Client doit contacter le Vendeur à :
-                        casastephiberico@gmail.com en indiquant son numéro de commande.
+                        casastephmetz@gmail.com en indiquant son numéro de commande.
                     </p>
                 </>
             ),
@@ -167,7 +167,7 @@ export const CGVPage = () => {
                     </p>
                     <p className="mt-2">
                         Pour toute réclamation, le Client peut contacter le Vendeur à :
-                        casastephiberico@gmail.com ou par téléphone au +33 6 89 66 91 15.
+                        casastephmetz@gmail.com ou par téléphone au +33 6 89 66 91 15.
                         Le Vendeur s'engage à répondre dans un délai de <strong>5 jours ouvrés</strong>.
                     </p>
                 </>
@@ -179,7 +179,7 @@ export const CGVPage = () => {
                 <>
                     <p>
                         En cas de litige, le Client est invité à contacter en premier lieu le service client
-                        à casastephiberico@gmail.com afin de trouver une solution amiable.
+                        à casastephmetz@gmail.com afin de trouver une solution amiable.
                     </p>
                     <p className="mt-2">
                         En cas d'échec de cette démarche amiable, le Client peut recourir gratuitement à la médiation
