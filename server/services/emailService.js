@@ -265,7 +265,7 @@ const sendOrderConfirmationEmail = async (order, user) => {
           <h2 style="color: #1a1714;">Merci pour votre commande${user.firstName ? ', ' + user.firstName : ''} !</h2>
           <p>Votre commande <strong>${orderNumber}</strong> a bien été reçue.</p>
           ${order.paymentMethod !== 'cash' ? `
-          <p style="color: #555;">Vous avez choisi le paiement par <strong>lien sécurisé</strong>. Notre équipe va préparer votre commande et vous enverra prochainement un lien de paiement sécurisé${order.contactPreference === 'whatsapp' ? ' par <strong>WhatsApp</strong>' : ' par <strong>email</strong>'}. Il ne vous restera plus qu'à régler en ligne pour finaliser votre commande.</p>
+          <p style="color: #555;">Vous avez choisi le paiement par <strong>lien sécurisé</strong>. Notre équipe vous enverra prochainement un lien de paiement${order.contactPreference === 'whatsapp' ? ' par <strong>WhatsApp</strong>' : ' par <strong>email</strong>'}. Une fois le paiement effectué, nous préparerons votre commande et vous tiendrons informé(e) à chaque étape.</p>
           ` : `
           <p style="color: #555;">Vous avez choisi le paiement en <strong>espèces à la livraison</strong>. Nous préparons votre commande dès que possible.</p>
           `}
