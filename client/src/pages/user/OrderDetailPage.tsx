@@ -109,7 +109,7 @@ export const OrderDetailPage = () => {
     const statusBadge = getStatusBadge(order.status);
     const StatusIcon = statusBadge.icon;
     const items = parseItems(order.items);
-    const canDownloadInvoice = order.invoiceNumber != null && ['paye', 'en_preparation', 'pret_pour_livraison', 'livre'].includes(order.status);
+    const canDownloadInvoice = order.invoiceNumber != null && order.paymentStatus === 'paid';
 
     const handleDownloadInvoice = () => {
         const token = localStorage.getItem('authToken');
