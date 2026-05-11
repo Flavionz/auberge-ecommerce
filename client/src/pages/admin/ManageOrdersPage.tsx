@@ -117,7 +117,6 @@ export const ManageOrdersPage = () => {
                 { deliveryDate, deliveryTimeSlot: deliveryTime },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            await sendNotification(selectedOrder.id, 'ready');
             alert('Créneau défini et email envoyé avec succès !');
             await fetchOrders();
             setShowDeliveryModal(false);
