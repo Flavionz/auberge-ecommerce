@@ -456,7 +456,10 @@ export const ManageOrdersPage = () => {
                             <section>
                                 <h4 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">Changer le statut</h4>
                                 <div className="grid grid-cols-2 gap-2">
-                                    {Object.entries(STATUS_CONFIG).map(([key, cfg]) => {
+                                    {Object.entries(STATUS_CONFIG).filter(([key]) => {
+                                        if (selectedOrder.paymentMethod === 'cash' && (key === 'lien_envoye' || key === 'paye')) return false;
+                                        return true;
+                                    }).map(([key, cfg]) => {
                                         const Icon = cfg.icon;
                                         const isCurrent = selectedOrder.status === key;
                                         return (

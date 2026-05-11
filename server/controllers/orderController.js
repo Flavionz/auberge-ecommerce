@@ -203,16 +203,18 @@ const updateOrderStatus = async (req, res) => {
         const order = await prisma.order.update({
             where: { id: parseInt(id) },
             data: updateData,
+            include: { user: { select: { email: true, firstName: true, lastName: true } } },
         });
 
         if (['paye', 'livre', 'annule'].includes(status)) {
-            const user = await prisma.user.findUnique({
-                where: { id: order.userId },
-                select: { email: true, firstName: true, lastName: true },
-            });
+            const user = order.user;
+            const isCash = order.paymentMethod === 'cash';
             if (user) {
-                if (status === 'paye') sendPaymentConfirmedEmail(order, user).catch(err => console.error('Payment confirmed email error:', err));
-                if (status === 'livre') sendOrderDeliveredEmail(order, user).catch(err => console.error('Delivered email error:', err));
+                if (status === 'paye' && !isCash) sendPaymentConfirmedEmail(order, user).catch(err => console.error('Payment confirmed email error:', err));
+                if (status === 'livre') {
+                    if (isCash) await prisma.order.update({ where: { id: order.id }, data: { paymentStatus: 'paid' } });
+                    sendOrderDeliveredEmail(order, user).catch(err => console.error('Delivered email error:', err));
+                }
                 if (status === 'annule') sendOrderCancelledEmail(order, user).catch(err => console.error('Order cancelled email error:', err));
             }
         }
