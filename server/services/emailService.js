@@ -152,7 +152,7 @@ const sendOrderDeliveredEmail = async (order, user) => {
 
           <p style="color: #444; font-size: 15px; line-height: 1.6;">
             Votre commande <strong>${orderNumber}</strong> a bien été livrée.
-            Nous espérons que vous régalez avec nos produits ibériques !
+            Nous espérons que vous vous régalez avec nos produits ibériques !
           </p>
 
           <div style="background-color: #f9f6f2; border-left: 4px solid #C9A66B; padding: 18px 20px; margin: 25px 0; border-radius: 0 8px 8px 0;">
@@ -263,7 +263,12 @@ const sendOrderConfirmationEmail = async (order, user) => {
 
         <div style="padding: 40px 30px;">
           <h2 style="color: #1a1714;">Merci pour votre commande${user.firstName ? ', ' + user.firstName : ''} !</h2>
-          <p>Votre commande <strong>${orderNumber}</strong> a bien été reçue. Nous la préparons dès que possible.</p>
+          <p>Votre commande <strong>${orderNumber}</strong> a bien été reçue.</p>
+          ${order.paymentMethod !== 'cash' ? `
+          <p style="color: #555;">Vous avez choisi le paiement par <strong>lien sécurisé</strong>. Notre équipe va préparer votre commande et vous enverra prochainement un lien de paiement sécurisé${order.contactPreference === 'whatsapp' ? ' par <strong>WhatsApp</strong>' : ' par <strong>email</strong>'}. Il ne vous restera plus qu'à régler en ligne pour finaliser votre commande.</p>
+          ` : `
+          <p style="color: #555;">Vous avez choisi le paiement en <strong>espèces à la livraison</strong>. Nous préparons votre commande dès que possible.</p>
+          `}
 
           <div style="background-color: #f9f6f2; border-left: 4px solid #C9A66B; padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0;">
             <p style="margin: 0 0 6px 0;"><strong>📍 Adresse de livraison :</strong> ${order.deliveryAddress}, ${order.postalCode}</p>
