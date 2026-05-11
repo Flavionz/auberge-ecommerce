@@ -331,6 +331,53 @@ const sendOrderConfirmationEmail = async (order, user) => {
     }
 };
 
+const sendOrderCancelledEmail = async (order, user) => {
+    const orderNumber = `AE-${order.id.toString().padStart(6, '0')}`;
+    const mailOptions = {
+        from: process.env.SMTP_FROM || '"Casa Steph Iberico" <casastephmetz@gmail.com>',
+        to: user.email,
+        subject: `Annulation de votre commande ${orderNumber}`,
+        html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background-color: #1a1714; padding: 30px; text-align: center;">
+          <h1 style="color: #C9A66B; margin: 0; font-size: 24px;">Casa Steph Iberico</h1>
+          <p style="color: #888; margin: 5px 0 0 0; font-size: 13px;">Charcuterie & fromages ibériques · Metz</p>
+        </div>
+
+        <div style="padding: 40px 30px;">
+          <h2 style="color: #1a1714;">Votre commande a été annulée</h2>
+          <p>Bonjour${user.firstName ? ' ' + user.firstName : ''},</p>
+          <p>Votre commande <strong>${orderNumber}</strong> a été annulée. Nous nous excusons pour la gêne occasionnée.</p>
+
+          <div style="background-color: #f9f6f2; border-left: 4px solid #C9A66B; padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0;">
+            <p style="margin: 0; color: #666;">Pour toute question concernant cette annulation, n'hésitez pas à nous contacter.</p>
+          </div>
+
+          <p style="color: #666; font-size: 14px;">
+            Des questions ? Contactez-nous par WhatsApp au <strong>+33 6 89 66 91 15</strong> ou par email à <a href="mailto:casastephmetz@gmail.com" style="color: #C9A66B;">casastephmetz@gmail.com</a>.
+          </p>
+        </div>
+
+        <div style="background-color: #f5f5f5; padding: 20px 30px; text-align: center;">
+          <p style="margin: 0; font-size: 12px; color: #999;">
+            Casa Steph Iberico, Metz, France<br>
+            <a href="${process.env.CLIENT_URL || 'http://localhost:5173'}" style="color: #C9A66B; text-decoration: none;">casasteph.fr</a>
+          </p>
+        </div>
+      </div>
+    `,
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log(`✅ Order cancelled email sent to ${user.email}`);
+        return { success: true };
+    } catch (error) {
+        console.error('❌ Order cancelled email failed:', error);
+        return { success: false, error };
+    }
+};
+
 const sendWelcomeEmail = async (user) => {
     const mailOptions = {
         from: process.env.SMTP_FROM || '"Casa Steph Iberico" <casastephmetz@gmail.com>',
@@ -795,6 +842,7 @@ const sendAdminNewOrderEmail = async (order, customer) => {
 module.exports = {
     sendOrderInDeliveryEmail,
     sendOrderDeliveredEmail,
+    sendOrderCancelledEmail,
     sendPasswordResetEmail,
     sendWelcomeEmail,
     sendOrderConfirmationEmail,
