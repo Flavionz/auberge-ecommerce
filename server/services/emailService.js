@@ -273,7 +273,7 @@ const sendOrderConfirmationEmail = async (order, user) => {
           <div style="background-color: #f9f6f2; border-left: 4px solid #C9A66B; padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0;">
             <p style="margin: 0 0 6px 0;"><strong>📍 Adresse de livraison :</strong> ${order.deliveryAddress}, ${order.postalCode}</p>
             <p style="margin: 0 0 6px 0;"><strong>💳 Paiement :</strong> ${paymentLabel}</p>
-            <p style="margin: 0;"><strong>📋 Statut :</strong> En attente de préparation</p>
+            <p style="margin: 0;"><strong>📋 Statut :</strong> ${order.paymentMethod !== 'cash' ? 'En attente de paiement' : 'En attente de préparation'}</p>
           </div>
 
           <h3 style="color: #1a1714; border-bottom: 2px solid #C9A66B; padding-bottom: 8px;">Détail de la commande</h3>
